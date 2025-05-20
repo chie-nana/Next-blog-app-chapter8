@@ -2,15 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-
-type Post = {
-  id: string;
-  title: string;
-  thumbnailUrl: string;
-  createdAt: string;
-  categories: string[];
-  content: string;
-}
+import { Post } from "@/types/Post";
 
 const Home = () => {
   const [posts, setPosts] = useState<Post[]>([]);
