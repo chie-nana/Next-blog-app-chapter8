@@ -1,0 +1,18 @@
+.header {
+  background-color: #333;
+  padding: 20px 25px;
+}
+
+.header .ul {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+  padding: 0;
+}
+
+.header .ul .li {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 800;
+}

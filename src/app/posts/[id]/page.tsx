@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Post } from "@/types/Post";
 import Image from "next/image";
+import classes from "../../../style/PostDetail.module.css";
 
 export const PostDetail: React.FC = () => {
   const params = useParams(); // ← useParamsフックはNext.jsではオブジェクト型で返される
@@ -35,33 +36,33 @@ export const PostDetail: React.FC = () => {
   if (error) return <p>エラー:{error}</p>;
   if (!post) return <p>記事が見つかりませんでした</p>;
   return (
-    <div className="max-w-3xl mx-auto p-4">
-      <div className="mb-4">
+    <div className={classes.detailContainer}>
+      <div className={classes.detailMain}>
         {/* Imageの最適化。Next.jsではimgではなくImage推奨 */}
-        <div>
+        <div className={classes.detailImgBox}>
           <Image
             src={post.thumbnailUrl}
             alt={post.title}
             width={800}
             height={400}
-            className="rounded"
+            className={classes.detailImg}
           />
         </div>
 
-        <div className="flex items-center justify-between mb-2">
-          <time className="text-sm text-gray-500">
+        <div className={classes.postWrapper}>
+          <time className={classes.detailDate}>
             {new Date(post.createdAt).toLocaleDateString()}
           </time>
-          <div className="space-x-2">
+          <div>
             {post.categories.map((category) => {
               return (
-                <span key={category} className="text-xs text-white bg-blue-600 px-2 py-1 rounded">{category}</span>
+                <span key={category} className={classes.postCategory}>{category}</span>
               );
             })}
           </div>
         </div>
-        <h2 className="text-2xl font-bold mb-4">APIで取得した{post.title}</h2>
-        <p className="prose" dangerouslySetInnerHTML={{ __html: post.content }}></p>
+        <h2 className="title">APIで取得した{post.title}</h2>
+        <p className={classes.detailContent} dangerouslySetInnerHTML={{ __html: post.content }}></p>
       </div>
     </div>
   );

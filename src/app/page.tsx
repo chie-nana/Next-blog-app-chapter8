@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Post } from "@/types/Post";
+import classes from "../style/Home.module.css"
 
 const Home = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -35,30 +36,30 @@ const Home = () => {
   }
 
   return (
-    <div className="px-6 py-8">
-      <ul className="space-y-6"> {/* mapメソッドで記事データを取得し繰り返し表示 */}
+    <div className={classes.container}>
+      <ul className={classes.ul}>
         {posts.map((post) => (
-          <li key={post.id} className="border-b pb-4">
-            <Link href={`/posts/${post.id}`}>
-              <div className="mb-2">
+          <li key={post.id} className={classes.postList}>
+            <Link href={`/posts/${post.id}`} className={classes.postLink}>
+              <div className={classes.postWrapper}>
                 {/* 日付をJavascriptのnew Date()で返し、toLocaleDateString()で整えて表示する */}
-                <time className="text-sm text-gray-500">
+                <time className={classes.postDate}>
                   {new Date(post.createdAt).toLocaleDateString()}
                 </time>
                 {/* カテゴリーをmapメソッドで取得し表示する */}
-                <div className="space-x-2 mt-1">
+                <div>
                   {post.categories.map((category) => {
                     return (
-                      <span key={category} className="text-xs text-white bg-blue-600 px-2 py-1 rounded">
+                      <span key={category} className={classes.postCategory}>
                         {category}
                       </span>
                     );
                   })}
                 </div>
               </div>
-              <h2 className="text-xl font-bold mt-2">{post.title}</h2>
+              <h2 className={classes.title}>{post.title}</h2>
               {/* ReactでHTMLをそのまま表示:dangerouslySetInnerHTML属性を使用 */}
-              <p className="text-gray-700 mt-1" dangerouslySetInnerHTML={{ __html: post.content }}>
+              <p className={classes.postContent} dangerouslySetInnerHTML={{ __html: post.content }}>
               </p>
             </Link>
           </li>
