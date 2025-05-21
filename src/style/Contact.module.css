@@ -1,0 +1,72 @@
+.contactContainer {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 2%;
+}
+
+.h2 {
+  margin-bottom: 50px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.formItem {
+  display: flex;
+  margin-bottom: 40px;
+}
+
+.formChild {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.error {
+  margin-bottom: 30px;
+  font-size: 10px;
+  color: red;
+}
+
+.label {
+  width: 250px;
+}
+
+.formChild>input {
+  padding: 20px;
+  border-radius: 5px;
+  border: 1.5px solid #bababa;
+  width: calc(100% - 40px);
+}
+
+.textarea {
+  border-radius: 5px;
+  border: 1.5px solid #bababa;
+  width: 100%;
+  padding: 10px;
+  width: calc(100% - 20px);
+}
+
+.btnContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btnContainer>input {
+  width: 90px;
+  padding: 10px;
+  background: #333;
+  color: #fff;
+  font-weight: 900;
+  border-radius: 10px;
+}
+
+.btnContainer>button {
+  width: 90px;
+  padding: 10px;
+  font-weight: 900;
+  background: #e3e3e3;
+  border: #e3e3e3 1px solid;
+  border-radius: 10px;
+}
