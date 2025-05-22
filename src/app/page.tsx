@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Post } from "@/types/Post";
-import classes from "../style/Home.module.css"
+import { Post } from "@/app/_types/Post";
+import classes from "../styles/Home.module.css"
 
 const Home = () => {
   const [posts, setPosts] = useState<Post[]>([]);

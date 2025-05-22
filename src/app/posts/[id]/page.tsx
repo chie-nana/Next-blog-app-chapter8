@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Post } from "@/types/Post";
+import { Post } from "@/app/_types/Post";
 import Image from "next/image";
-import classes from "../../../style/PostDetail.module.css";
+import classes from "../../../styles/PostDetail.module.css";
 
 export const PostDetail: React.FC = () => {
   const params = useParams(); // ← useParamsフックはNext.jsではオブジェクト型で返される

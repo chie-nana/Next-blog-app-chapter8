@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import classes from '../../style/Contact.module.css';
+import classes from '../contact/Contact.module.css';
 
 // 型定義
 type ContactData = {
@@ -15,7 +15,8 @@ type ContactError = {
   message?: string;
 };
 
-export const Contact: React.FC = () => {
+const Contact: React.FC = () => {
+
   // ステート定義(初期値設定)
   const [contactData, setContactData] = useState<ContactData>({
     name: "",
