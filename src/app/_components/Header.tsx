@@ -1,7 +1,7 @@
 "use client"; //クライアントサイドで実行
 
 import Link from "next/link";
-import classes from "../style/Header.module.css"
+import classes from "../../style/Header.module.css"
 
 export const Header:React.FC = () => {
   return (
