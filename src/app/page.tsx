@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Post } from "@/app/_types/Post";
-import classes from "../styles/Home.module.css"
+import classes from "@/app/_styles/Home.module.css"
 
 const Home = () => {
   const [posts, setPosts] = useState<Post[]>([]);
