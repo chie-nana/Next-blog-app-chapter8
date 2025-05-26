@@ -2,6 +2,9 @@
 const nextConfig = {
   images: {
     domains: ["placehold.jp"], // ← ここに追加！
+    remotePatterns: [
+      { protocol: 'https', hostname: 'images.microcms-assets.io' }, // これを追加
+    ],
   },
 };
 
