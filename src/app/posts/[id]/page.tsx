@@ -23,7 +23,8 @@ export const PostDetail: React.FC = () => {
           `https://4zmimxorag.microcms.io/api/v1/posts/${id}`,// microCMSのエンドポイント
           {
             headers: {
-              'X-MICROCMS-API-KEY': 'M8Can9QIcdNtBha8ctgylpLYw7stIF9yrxtB',// APIキーをセット
+              'X-MICROCMS-API-KEY': process.env
+                .NEXT_PUBLIC_MICROCMS_API_KEY as string,// APIキーをセット
             },
           },
         );
