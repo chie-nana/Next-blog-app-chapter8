@@ -4,6 +4,15 @@
   padding: 0 2%;
 }
 
+.detailImgBox{
+  width: 50%;
+  margin: 0 auto;
+}
+
+.detailImg{
+  width: 100%;
+
+}
 .postWrapper {
   display: flex;
   align-items: center;
