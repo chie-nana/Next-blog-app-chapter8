@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Post } from "@/app/_types/Post";
+import { MicroCmsPost } from "@/app/_types/MicroCmsPost";
 import Image from "next/image";
 import classes from "@/app/_styles/PostDetail.module.css";
 
@@ -10,7 +10,7 @@ export const PostDetail: React.FC = () => {
   const params = useParams(); // ← useParamsフックはNext.jsではオブジェクト型で返される
   const id = params?.id as string;
 
-  const [post, setPost] = useState<Post | null>(null);
+  const [post, setPost] = useState<MicroCmsPost | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,10 +19,17 @@ export const PostDetail: React.FC = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await fetch(`https://1hmfpsvto6.execute-api.ap-northeast-1.amazonaws.com/dev/posts/${id}`);
+        const res = await fetch(
+          `https://4zmimxorag.microcms.io/api/v1/posts/${id}`,// microCMSのエンドポイント
+          {
+            headers: {
+              'X-MICROCMS-API-KEY': 'M8Can9QIcdNtBha8ctgylpLYw7stIF9yrxtB',// APIキーをセット
+            },
+          },
+        );
         if (!res.ok) throw new Error("記事の取得に失敗しました！！！");
         const data = await res.json();
-        setPost(data.post); //setPost(data);になっていたせいでデータが表示されなかった
+        setPost(data); //setPost(data);になっていたせいでデータが表示されなかった
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -41,7 +48,7 @@ export const PostDetail: React.FC = () => {
         {/* Imageの最適化。Next.jsではimgではなくImage推奨 */}
         <div className={classes.detailImgBox}>
           <Image
-            src={post.thumbnailUrl}
+            src={post.thumbnail.url}
             alt={post.title}
             width={800}
             height={400}
@@ -56,7 +63,7 @@ export const PostDetail: React.FC = () => {
           <div>
             {post.categories.map((category) => {
               return (
-                <span key={category} className={classes.postCategory}>{category}</span>
+                <span key={category.id} className={classes.postCategory}>{category.name}</span>
               );
             })}
           </div>
