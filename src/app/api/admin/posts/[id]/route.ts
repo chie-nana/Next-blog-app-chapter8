@@ -18,7 +18,7 @@ export const GET = async (
             category: {
               select: {
                 id: true,
-                name:true,
+                name: true,
               },
             },
           },
@@ -38,7 +38,7 @@ interface UpdatePostRequestBody {
   title: string,
   content: string,
   categories: { id: number }[],
-  thumbnailUrl:string
+  thumbnailUrl: string
 }
 
 // PUTという命名にすることで、PUTリクエストの時にこの関数が呼ばれる
@@ -76,7 +76,7 @@ export const PUT = async (
       await prisma.postCategory.create({
         data: {
           postId: post.id,
-          categoryId : category.id,
+          categoryId: category.id,
         },
       })
     }
@@ -85,6 +85,28 @@ export const PUT = async (
     return NextResponse.json({ status: "OK", post: post }, { status: 200 })
   } catch (error) {
     if (error instanceof Error)
-      return NextResponse.json({ status: error.message }, {status: 400})
- }
+      return NextResponse.json({ status: error.message }, { status: 400 })
+  }
+}
+
+// DELETEという命名にすることで、DELETEリクエストの時にこの関数が呼ばれる
+export const DELETE = async (
+  request: NextRequest,
+  { params }: { params: { id: string } },// ここでリクエストパラメータを受け取る
+) => {
+  // paramsの中にidが入っているので、それを取り出す
+  const { id } = params;
+
+  try {
+    await prisma.post.delete({
+      where: {
+        id: parseInt(id),
+      },
+    })
+    // レスポンスを返す
+    return NextResponse.json({ status: "OK" }, { status: 200 })
+  } catch (error) {
+    if (error instanceof Error)
+      return NextResponse.json({ status: error.message }, { status: 400 })
+  }
 }
