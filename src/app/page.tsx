@@ -2,25 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { MicroCmsPost } from "@/app/_types/MicroCmsPost";
+import { Post } from "@/app/_types/Post";
 import classes from "@/app/_styles/Home.module.css"
 
 const Home = () => {
-  const [posts, setPosts] = useState<MicroCmsPost[]>([])
+  const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetcher = async () => {
       try {
-        const res = await fetch('https://4zmimxorag.microcms.io/api/v1/posts', {// 管理画面で取得したエンドポイントを入力してください。
-          headers: {// fetch関数の第二引数にheadersを設定でき、その中にAPIキーを設定します。
-            'X-MICROCMS-API-KEY': process.env
-              .NEXT_PUBLIC_MICROCMS_API_KEY as string, // 管理画面で取得したAPIキーを入力してください。
-          },
-        })
-        const { contents } = await res.json()
-        setPosts(contents)
+        const res = await fetch('http://localhost:3000/api/posts')// Nextjsの自作APIへ変更
+        const { posts } = await res.json()
+        setPosts(posts)
       } catch (error: any) {
         setError(error.message);
       } finally {
@@ -52,10 +47,10 @@ const Home = () => {
                 </time>
                 {/* カテゴリーをmapメソッドで取得し表示する */}
                 <div>
-                  {post.categories.map((category) => {
+                  {post.postCategories.map((pc) => {
                     return (
-                      <span key={category.id} className={classes.postCategory}>
-                        {category.name}
+                      <span key={pc.category.id} className={classes.postCategory}>
+                        {pc.category.name}
                       </span>
                     );
                   })}

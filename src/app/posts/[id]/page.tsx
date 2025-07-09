@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { MicroCmsPost } from "@/app/_types/MicroCmsPost";
+import { Post } from "@/app/_types/Post";
 import Image from "next/image";
 import classes from "@/app/_styles/PostDetail.module.css";
 
@@ -10,7 +10,7 @@ export const PostDetail: React.FC = () => {
   const params = useParams(); // ← useParamsフックはNext.jsではオブジェクト型で返される
   const id = params?.id as string;
 
-  const [post, setPost] = useState<MicroCmsPost | null>(null);
+  const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,18 +19,10 @@ export const PostDetail: React.FC = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await fetch(
-          `https://4zmimxorag.microcms.io/api/v1/posts/${id}`,// microCMSのエンドポイント
-          {
-            headers: {
-              'X-MICROCMS-API-KEY': process.env
-                .NEXT_PUBLIC_MICROCMS_API_KEY as string,// APIキーをセット
-            },
-          },
-        );
+        const res = await fetch(`http://localhost:3000/api/posts/${id}`); // Next.jsの自作APIへ変更
         if (!res.ok) throw new Error("記事の取得に失敗しました！！！");
-        const data = await res.json();
-        setPost(data); //setPost(data);になっていたせいでデータが表示されなかった
+        const { post } = await res.json();
+        setPost(post); //setPost(data);になっていたせいでデータが表示されなかった
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -49,7 +41,7 @@ export const PostDetail: React.FC = () => {
         {/* Imageの最適化。Next.jsではimgではなくImage推奨 */}
         <div className={classes.detailImgBox}>
           <Image
-            src={post.thumbnail.url}
+            src={post.thumbnailUrl}
             alt={post.title}
             width={800}
             height={400}
@@ -62,9 +54,9 @@ export const PostDetail: React.FC = () => {
             {new Date(post.createdAt).toLocaleDateString()}
           </time>
           <div>
-            {post.categories.map((category) => {
+            {post.postCategories.map((pc) => {
               return (
-                <span key={category.id} className={classes.postCategory}>{category.name}</span>
+                <span key={pc.category.id} className={classes.postCategory}>{pc.category.name}</span>
               );
             })}
           </div>

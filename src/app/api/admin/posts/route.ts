@@ -38,7 +38,6 @@ interface CreatePostRequestBody {
   thumbnailUrl: string
 }
 
-
 // POSTという命名にすることで、POSTリクエストの時にこの関数が呼ばれる
 export const POST = async (request: NextRequest, context: any) => {
   try {
