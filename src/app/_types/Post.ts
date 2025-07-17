@@ -11,3 +11,8 @@ export type Post = {
     }
   }[]; // カテゴリーは配列で、各カテゴリーはidとnameを持つ
 };
+
+export interface Category{
+  id: number;
+  name: string;
+}
