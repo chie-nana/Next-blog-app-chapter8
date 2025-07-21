@@ -33,7 +33,7 @@ export default function AdminCategoriesPage() {
     <>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-xl font-bold">カテゴリー一覧</h1>
-        <Link href="/api/admin/categories/new" className="p-3 bg-[#f26c00d6] rounded-lg py-2  px-5  font-bold text-white">新規作成</Link>
+        <Link href="/admin/categories/new" className="p-3 bg-[#f26c00d6] rounded-lg py-2  px-5  font-bold text-white">新規作成</Link>
       </div>
 
       <div>
@@ -43,7 +43,7 @@ export default function AdminCategoriesPage() {
           <ul>
             {categories.map((category) => (
               <li key={category.id}>
-                <Link href={`/admin/categories/{category.id}`} className="block hover:bg-[#c1d7da] p-5 border-b border-gray-200">
+                <Link href={`/admin/categories/{category.id}`} className="block hover:bg-[#ccdee7] p-5 border-b border-gray-200">
                   <h2 className="font-bold text-xl">{category.name}</h2>
                 </Link>
               </li>

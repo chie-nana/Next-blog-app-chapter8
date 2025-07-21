@@ -15,8 +15,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <aside className="w-64 bg-gray-100 h-screen">
         <nav>
           <ul className="space-y-2">
-            <li><Link href="/admin/posts" className="block hover:bg-[#c1d7da] p-4">記事一覧</Link></li>
-            <li><Link href="/admin/categories" className="block hover:bg-[#c1d7da] p-4">カテゴリー一覧</Link></li>
+            <li><Link href="/admin/posts" className="block hover:bg-[#ccdee7] p-4">記事一覧</Link></li>
+            <li><Link href="/admin/categories" className="block hover:bg-[#ccdee7] p-3">カテゴリー一覧</Link></li>
           </ul>
         </nav>
       </aside>
