@@ -43,7 +43,7 @@ export default function AdminCategoriesPage() {
           <ul>
             {categories.map((category) => (
               <li key={category.id}>
-                <Link href={`/admin/categories/{category.id}`} className="block hover:bg-[#ccdee7] p-5 border-b border-gray-200">
+                <Link href={`/admin/categories/${category.id}`} className="block hover:bg-[#ccdee7] p-5 border-b border-gray-200">
                   <h2 className="font-bold text-xl">{category.name}</h2>
                 </Link>
               </li>

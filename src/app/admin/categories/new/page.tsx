@@ -1,13 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter} from "next/navigation";
 
-export default function NewCategoryPage() {
+export default function CreateCategories() {//※型の有無要確認
   const [newCategoryName, setNewCategoryName] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);//※error有効かされていない
 
-  const handleSubmit = async(e:React.FormEvent) => {
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {//※React.FCとの違い
     e.preventDefault();
 
     setLoading(true); // フォーム送信が始まるので、loading の情報ボードを「true」（作成中）にする
@@ -15,15 +18,17 @@ export default function NewCategoryPage() {
 
     try {
       const res = await fetch("/api/admin/categories", {
+        // 第2引数:HTTPリクエストを送信するための関数
         method: "POST",
         headers: {
-          ContentType: "application/json", // 送るデータがJSON形式
+          ContentType: "application/json", //json形式で送る
         },
         body: JSON.stringify({ name: newCategoryName }),
       });
       if (res.ok) {
         alert("カテゴリーが作成されました");
         setNewCategoryName(''); // 入力フィールドをクリア
+        router.push("/admin/categories"); // 作成成功後、カテゴリー一覧ページにリダイレクト
       } else {
         alert(`カテゴリーの作成に失敗しました`);
       }
@@ -38,7 +43,7 @@ export default function NewCategoryPage() {
 
   return (
     <div>
-      <h1 className="font-bold text-2xl">カテゴリー作成</h1>
+      <h1 className="font-bold text-2xl mb-8">カテゴリー作成</h1>
       <form onSubmit={handleSubmit} className="space-y-4 mt-4" >
         <label htmlFor="categoryName" className="block">カテゴリー名</label>
         <input
