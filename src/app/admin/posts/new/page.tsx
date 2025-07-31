@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Post } from "@/app/_types/Post";// Post型を使うためにインポート
-import { Category } from "@/app/_types/Post"; // Category型もインポート！
+import { Category } from "@/app/_types/Post"; // Category型もインポート
 
 export default function CreatePosts() {
   const router = useRouter();
@@ -128,7 +128,7 @@ export default function CreatePosts() {
           id="content"
           name="content"
           className="border p-2 w-full rounded block mb-4"
-          rows={10}
+          rows={5}
           value={newPostContent}
           onChange={(e) => { setNewPostContent(e.target.value) }}
         ></textarea>
@@ -142,8 +142,61 @@ export default function CreatePosts() {
           value={newPostThumbnailUrl}
           onChange={(e) => { setNewPostThumbnailUrl(e.target.value) }}
         />
+        {/* カテゴリー選択欄 - ここから新しい方式に置き換える */}
+          <label htmlFor="postCategories" className="block text-sm font-medium text-gray-700 mb-1">カテゴリー</label>
+          {/* ✅ ここから select タグの代わりに div ベースの選択肢を配置 ✅ */}
+          <div className="flex flex-wrap justify-start gap-2 border rounded p-2 mb-8">
+            {/* availableCategories がまだ読み込み中の場合 */}
+            {loadingCategories ? (
+              <p className="text-gray-500">カテゴリー読み込み中...</p>
+            ) : errorCategories ? (
+              <p className="text-red-500">カテゴリー取得エラー: {errorCategories}</p>
+            ) : availableCategories.length === 0 ? (
+              <p className="text-gray-500">利用可能なカテゴリーがありません。</p>
+            ) : (
+              // 利用可能なカテゴリーがあれば map で表示
+              availableCategories.map((category) => {
+                // そのカテゴリーが現在選択されているかチェック
+                // editPostCategories は { id: number }[] の形式なので、id を抽出して includes でチェック
+                const isSelected = newPostCategories.some(
+                  (selectedCat) => selectedCat.id === category.id
+                );
 
-        <label htmlFor="postCategories" className="block">カテゴリー</label>
+                return (
+                  <div
+                    key={category.id}
+                    onClick={() => {
+                      // クリックされたカテゴリーを選択/非選択を切り替える
+                      const currentSelectedIds = newPostCategories.map(cat => cat.id); // 現在選択されているIDのリスト
+                      if (isSelected) {
+                        // もしすでに選択されていたら、リストから削除
+                        setNewPostCategories(
+                          newPostCategories.filter(
+                            (selectedCat) => selectedCat.id !== category.id
+                          )
+                        );
+                      } else {
+                        // もし選択されていなかったら、リストに追加
+                        // category は { id: string, name: string } 型なので、{ id: number } 型に変換して追加
+                        setNewPostCategories([
+                          ...newPostCategories,
+                          { id: parseInt(category.id.toString()) }, // 必要に応じて id を数値に変換
+                        ]);
+                      }
+                    }}
+                    className={`
+                      border border-gray-300 rounded-md py-1 px-3 text-sm cursor-pointer
+                      ${isSelected ? "bg-blue-600 text-white border-blue-600" : "bg-gray-100 text-gray-800 hover:bg-gray-200"}
+                      transition-colors duration-200
+                    `}
+                  >
+                    {category.name}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        {/* <label htmlFor="postCategories" className="block">カテゴリー</label>
         <select
           id="postCategories"
           name="categories"// バックエンドの期待する 'categories'
@@ -163,7 +216,7 @@ export default function CreatePosts() {
           {availableCategories.map((category) => (
             <option key={category.id} value={category.id}>{category.name}</option>
           ))}
-        </select>
+        </select> */}
 
         <button
           type="submit"

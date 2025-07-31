@@ -19,7 +19,7 @@ export const PostDetail: React.FC = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/posts/${id}`); // Next.jsの自作APIへ変更
+        const res = await fetch(`/api/posts/${id}`); // Next.jsの自作APIへ変更
         if (!res.ok) throw new Error("記事の取得に失敗しました！！！");
         const { post } = await res.json();
         setPost(post); //setPost(data);になっていたせいでデータが表示されなかった
