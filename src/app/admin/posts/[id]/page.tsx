@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Post } from "@/app/_types/Post"; // Post型を使うために
 import { Category } from "@/app/_types/Post"; // Category型もインポート！
+import PostForm from "../_components/PostForm"; // PostForm コンポーネントをインポート
 
 export default function EditPosts({ params }: { params: { id: string } }) { //  URLパラメータを受け取る
   const { id } = params; // URLから記事のIDを取得 (ここで定義されている)
@@ -159,76 +160,31 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold mb-8">記事編集ページ</h1>
-      <form onSubmit={handleUpdate} className="space-y-4">
-        <label htmlFor="postTitle" className="block mb-1">タイトル</label>
-        <input
-          id="postTitle"
-          className="border rounded w-full p-2 mb-4"
-          type="text"
-          name="title"
-          value={editPostTitle}
-          onChange={(e) => { setEditPostTitle(e.target.value) }}
-        />
 
-        <label htmlFor="postContent" className="block mb-1">内容</label>
-        <textarea
-          id="postContent"
-          className="border rounded w-full p-2 mb-4"
-          name="content"
-          rows={5}
-          value={editPostContent}
-          onChange={(e) => { setEditPostContent(e.target.value) }}
-        />
+      <PostForm
+        title={editPostTitle}
+        setTitle={setEditPostTitle}
+        content={editPostContent}
+        setContent={setEditPostContent}
+        thumbnailUrl={editPostContent}
+        setThumbnailUrl={setEditPostThumbnailUrl}
+        categories={editPostCategories}
+        setCategories={setEditPostCategories}
 
-        <label htmlFor="postThumbnailUrl" className="block mb-1">サムネイルURL</label>
-        <input
-          id="postThumbnailUrl"
-          className="border rounded w-full p-2 mb-4"
-          type="text"
-          name="thumbnailUrl"
-          value={editPostThumbnailUrl}
-          onChange={(e) => (setEditPostThumbnailUrl(e.target.value))}
-        />
+        onSubmit={handleUpdate}
+        loading={loading}
+        availableCategories={availableCategories}
+        setAvailableCategories={setAvailableCategories}
+        loadingCategories={loadingCategories}
+        setLoadingCategories={setLoadingCategories}
+        errorCategories={errorCategories}
+        setErrorCategories={setErrorCategories}
 
-        <label htmlFor="postCategories" className="block mb-1">カテゴリー</label>
-        <select
-          id="postCategories"
-          className="border rounded w-full p-2"
-          name="categories" // バックエンドの期待する 'categories'
-          multiple // 複数選択を可能にする！
-          // value には、現在 editPostCategories に記憶されているIDの配列を渡す
-          // select タグは value に文字列の配列を期待するので、IDを文字列に変換する
-          value={editPostCategories.map(cat => cat.id.toString())}
-          onChange={(e) => {// ユーザーが選択したすべての <option> 要素を取得、Array.from() で配列に変換
-            const selectedOptions = Array.from(e.target.selectedOptions);
+        mode="edit" // 編集モード
+        onDelete={handleDelete} // 削除関数を渡す
 
-            // 選択されたオプションの value (ID) を数値に変換し、
-            // バックエンドが期待する { id: 数値ID } のオブジェクトの配列を作成
-            const newSelection = selectedOptions.map(option => ({ id: parseInt(option.value) }));
 
-            setEditPostCategories(newSelection); // editPostCategories Stateを更新
-          }}
-        >
-          <option value="">カテゴリーを選択してください</option>
-          {/* availableCategories から option タグを動的に生成 */}
-          {availableCategories.map((category) => (
-            <option key={category.id} value={category.id}>{category.name}</option>
-          ))}
-        </select>
-        <div className="flex justify-start space-x-3 mt-4">
-        <button
-          type="submit"
-          className="bg-blue-700 text-white py-2 px-3 rounded font-bold"
-          disabled={loading} // 送信中はボタンを無効化
-        >更新</button>
-        <button
-          type="button"
-          onClick={handleDelete}
-          className="bg-red-500 text-white py-2 px-3 rounded font-bold"
-          disabled={loading} // 送信中はボタンを無効化
-          >削除</button>
-          </div>
-      </form>
+      />
       <Link href="/admin/posts" className="mt-4 inline-block p-3 bg-[#f26c00d6] rounded-lg py-2 px-5 font-bold text-white">記事一覧に戻る</Link>
     </div>
   )

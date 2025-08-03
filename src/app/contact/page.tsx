@@ -83,7 +83,7 @@ const Contact: React.FC = () => {
     setContactData({ name: '', email: '', message: '' });
   };
   return (
-    <div className={classes.contactContainer}>
+    <div className="max-w-[50.00rem] my-10 m-auto py-0 px-8">
       <h2 className={classes.h2}>問い合わせフォーム</h2>
       <form onSubmit={handleSubmit}>
 
