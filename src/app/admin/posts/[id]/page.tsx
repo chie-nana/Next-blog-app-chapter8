@@ -185,7 +185,6 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
 
 
       />
-      <Link href="/admin/posts" className="mt-4 inline-block p-3 bg-[#f26c00d6] rounded-lg py-2 px-5 font-bold text-white">記事一覧に戻る</Link>
     </div>
   )
 }

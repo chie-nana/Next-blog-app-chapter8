@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState} from "react";
-import { useRouter} from "next/navigation";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import CategoryForm from "../_components/CategoryForm"; // CategoryForm コンポーネントをインポート
 
 export default function CreateCategories() {//※型の有無要確認
   const [newCategoryName, setNewCategoryName] = useState<string>('');
@@ -44,22 +45,14 @@ export default function CreateCategories() {//※型の有無要確認
   return (
     <div>
       <h1 className="font-bold text-2xl mb-8">カテゴリー作成</h1>
-      <form onSubmit={handleSubmit} className="space-y-4 mt-4" >
-        <label htmlFor="categoryName" className="block">カテゴリー名</label>
-        <input
-          id="categoryName"
-          className="border p-2 w-full rounded block"
-          type="text"
-          name="categoryName"
-          value={newCategoryName}
-          onChange={(e)=>{setNewCategoryName(e.target.value)}}
-        />
-        <button
-          type="submit"
-          className="bg-blue-700 text-white py-2 px-3 rounded font-bold"
-          disabled={loading} // 送信中はボタンを無効化
-        >作成</button>
-      </form>
+      <CategoryForm
+        name={newCategoryName}
+        setName={setNewCategoryName}
+        loading={loading}
+        onSubmit={handleSubmit}
+        error={error}
+        mode="new"
+      />
     </div>
   )
 }

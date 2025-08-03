@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
+import CategoryForm from "../_components/CategoryForm"
 
 export default function EditCategories({ params }: { params: { id: string } }) {
   const { id } = params;//IDを取得
@@ -104,19 +105,15 @@ export default function EditCategories({ params }: { params: { id: string } }) {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-8">カテゴリー編集</h1>
-      <form onSubmit={handleUpdate}>
-        <label htmlFor="categoryName" className="block">カテゴリー名</label>
-        <input
-          id="categoryName"
-          className="border p-2 w-full rounded block"
-          type="text"
-          name="categoryName"
-          value={editCategoryName}
-          onChange={(e) => { setEditCategoryName(e.target.value) }}
-        />
-        <button type="submit" className="bg-blue-700 text-white py-2 px-3 rounded font-bold mt-3" disabled={loading}>更新</button>
-        <button type="button" onClick={handleDelete} className="bg-red-600 text-white py-2 px-3 rounded font-bold ml-3 mt-3" disabled={loading}>削除</button>
-      </form>
+      <CategoryForm
+        name={editCategoryName}
+        setName={setEditCategoryName}
+        loading={loading}
+        onSubmit={handleUpdate}
+        error={error}
+        mode="edit"
+        onDelete={handleDelete}
+      />
     </div>
   )
 }
