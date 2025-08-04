@@ -36,8 +36,8 @@ const CategoryForm: React.FC<Props> = (props) => {
           >
             {props.mode === "new" ? "作成" : "更新"}
           </button>
-          {/* mode が 'edit' のときだけ、以下のコードを実行する */}
-          {props.mode === "edit" && (
+          {/* mode が 'edit' であり、かつ onDelete という関数が渡されてきた場合にだけ、ボタンが表示 */}
+          {props.mode === "edit" && props.onDelete && (
             <button
               type="button"
               onClick={props.onDelete}

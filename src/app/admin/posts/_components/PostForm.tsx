@@ -33,6 +33,7 @@ interface Props {
 }
 
 const PostForm: React.FC<Props> = (props) => {
+  //分割代入でかくと、const PostForm: React.FC<Props> = ({title,setTitle,content,setContent,onSubmit..}) =>{return}
   return (
     <form onSubmit={props.onSubmit}>
 
