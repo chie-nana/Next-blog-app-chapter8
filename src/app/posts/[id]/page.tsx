@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Post } from "@/app/_types/Post";
 import Image from "next/image";
-import classes from "@/app/_styles/PostDetail.module.css";
 
 export const PostDetail: React.FC = () => {
   const params = useParams(); // ← useParamsフックはNext.jsではオブジェクト型で返される
@@ -36,33 +35,33 @@ export const PostDetail: React.FC = () => {
   if (error) return <p>エラー:{error}</p>;
   if (!post) return <p>記事が見つかりませんでした</p>;
   return (
-    <div className={classes.detailContainer}>
-      <div className={classes.detailMain}>
+    <div className="max-w-[50.00rem] my-12  m-auto  py-0  px-8">
+      <div>
         {/* Imageの最適化。Next.jsではimgではなくImage推奨 */}
-        <div className={classes.detailImgBox}>
+        <div className="w-3/4 my-8 m-auto">
           <Image
             src={post.thumbnailUrl}
             alt={post.title}
             width={800}
             height={400}
-            className={classes.detailImg}
+            className="w-full"
           />
         </div>
 
-        <div className={classes.postWrapper}>
-          <time className={classes.detailDate}>
+        <div className="flex items-center justify-between mt-5 mb-5 text-[0.80rem] text-[#333]">
+          <time>
             {new Date(post.createdAt).toLocaleDateString()}
           </time>
           <div>
             {post.postCategories.map((pc) => {
               return (
-                <span key={pc.category.id} className={classes.postCategory}>{pc.category.name}</span>
+                <span key={pc.category.id} className="rounded-sm p-1.5 mr-3.5 text-[#2e64a2] border-[1px] border-[#2e64a2]">{pc.category.name}</span>
               );
             })}
           </div>
         </div>
-        <h2 className="title">APIで取得した{post.title}</h2>
-        <p className={classes.detailContent} dangerouslySetInnerHTML={{ __html: post.content }}></p>
+        <h2 className="font-semibold text-2xl mb-5">APIで取得した{post.title}</h2>
+        <p dangerouslySetInnerHTML={{ __html: post.content }}></p>
       </div>
     </div>
   );

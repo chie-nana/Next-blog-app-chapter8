@@ -1,7 +1,8 @@
+//app/contact/page.tsx
+
 "use client"
 
 import React, { useState } from 'react';
-import classes from '../contact/Contact.module.css';
 
 // 型定義
 type ContactData = {
