@@ -97,6 +97,7 @@ const Contact: React.FC = () => {
               value={contactData.name}
               onChange={handleChange}
               disabled={isSubmitting}
+              className='p-5 rounded w-[calc(100%-40px)] border-[1.5px] border-[#bababa]'
             />
             {errors.name && <p className="mb-8 text-[0.63rem] text-red">{errors.name}</p>}
           </div>
@@ -110,6 +111,7 @@ const Contact: React.FC = () => {
               value={contactData.email}
               onChange={handleChange}
               disabled={isSubmitting}
+              className='p-5 rounded w-[calc(100%-40px)] border-[1.5px] border-[#bababa]'
             />
             {errors.email && <p className="mb-8 text-[0.63rem] text-red">{errors.email}</p>}
           </div>
@@ -124,7 +126,7 @@ const Contact: React.FC = () => {
               onChange={handleChange}
               disabled={isSubmitting}
               rows={10}
-              className="rounded w-[calc(100%_-_20px)] p-3"
+              className="rounded w-[calc(100%-20px)] p-3 border-[1.5px] border-[#bababa]"
             />
             {errors.message && <p className="mb-8 text-[0.63rem] text-red">{errors.message}</p>}
           </div>
@@ -134,13 +136,13 @@ const Contact: React.FC = () => {
             type="submit"
             value="送信"
             disabled={isSubmitting}
-            className='w-24 p-3 text-[#fff] font-black rounded-xl'
+            className='w-24 p-3 text-[#fff] font-black rounded-xl bg-black'
           />
           <button
             type="button"
             onClick={handleClear}
             disabled={isSubmitting}
-            className="w-24 p-3 font-black rounded-xl"
+            className="w-24 p-3 font-black rounded-xl bg-gray-200 text-gray-800"
           >クリア</button>
         </div>
       </form>
