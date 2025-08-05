@@ -13,7 +13,7 @@ const Home = () => {
   useEffect(() => {
     const fetcher = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/posts')// Nextjsの自作APIへ変更
+        const res = await fetch('/api/posts')// Nextjsの自作APIへ変更
         const { posts } = await res.json()
         setPosts(posts)
       } catch (error: any) {
