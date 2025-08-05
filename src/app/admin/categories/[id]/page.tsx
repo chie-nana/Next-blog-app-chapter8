@@ -6,8 +6,8 @@ import CategoryForm from "../_components/CategoryForm"
 
 export default function EditCategories({ params }: { params: { id: string } }) {
   const { id } = params;//IDを取得
-
-  // ここでIDを使ってカテゴリーの情報を取得し、編集フォームに表示することができます
+  // ここでIDを使ってカテゴリーの情報を取得し、編集フォームに表示する
+  
   const [editCategoryName, setEditCategoryName] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);//編集ページを開くとデータ取りに行く、最初から「読み込み中(true)」
   const [error, setError] = useState<string | null>(null);

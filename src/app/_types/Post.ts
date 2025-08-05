@@ -4,15 +4,10 @@ export type Post = {
   thumbnailUrl: string;
   content: string;
   createdAt: string;
-  postCategories: {
-    category: {
-      id: number;
-      name: string;
-    }
-  }[]; // カテゴリーは配列で、各カテゴリーはidとnameを持つ
+  postCategories: { category: Category }[]; // カテゴリーは配列で、各カテゴリーはidとnameを持つ
 };
 
-export interface Category{
+export interface Category {
   id: number;
   name: string;
 }
