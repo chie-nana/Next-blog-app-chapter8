@@ -45,6 +45,7 @@ const PostForm: React.FC<Props> = (props) => {
         name="title"
         value={props.title}
         onChange={(e) => { props.setTitle(e.target.value) }}//入力値を更新
+        disabled={props.loading}
       />
 
       <label htmlFor="content" className="block">内容</label>
@@ -55,6 +56,7 @@ const PostForm: React.FC<Props> = (props) => {
         rows={5}
         value={props.content}
         onChange={(e) => { props.setContent(e.target.value) }}
+        disabled={props.loading}
       ></textarea>
 
       <label htmlFor="thumbnailUrl" className="block">サムネイルURL</label>
@@ -64,7 +66,8 @@ const PostForm: React.FC<Props> = (props) => {
         type="text"
         className="border p-2 w-full rounded block mb-4"
         value={props.thumbnailUrl}
-        onChange={(e) => { props.setThumbnailUrl(e.target.value) }}
+        onChange={(e) => { props.setThumbnailUrl(e.target.value)}}
+        disabled={props.loading}
       />
       {/* カテゴリー選択欄 - ここから新しい方式に置き換える */}
       <label htmlFor="postCategories" className="block text-sm font-medium text-gray-700 mb-1">カテゴリー</label>
@@ -90,6 +93,7 @@ const PostForm: React.FC<Props> = (props) => {
               <div
                 key={category.id}
                 onClick={() => {
+                  if (props.loading) return;//props.loadingがtrueの場合は処理を実行しない
                   // クリックされたカテゴリーを選択/非選択を切り替える
                   const currentSelectedIds = props.categories.map(cat => cat.id); // 現在選択されているIDのリスト
                   if (isSelected) {
@@ -111,7 +115,7 @@ const PostForm: React.FC<Props> = (props) => {
                 className={`
                       border border-gray-300 rounded-md py-1 px-3 text-sm cursor-pointer
                       ${isSelected ? "bg-blue-600 text-white border-blue-600" : "bg-gray-100 text-gray-800 hover:bg-gray-200"}
-                      transition-colors duration-200
+                      transition-colors duration-200 ${props.loading ? "pointer-events-none opacity-50" : ""}
                     `}
               >
                 {category.name}
