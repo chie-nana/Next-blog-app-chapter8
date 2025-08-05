@@ -27,6 +27,7 @@ const CategoryForm: React.FC<Props> = (props) => {
           name="categoryName"
           value={props.name}
           onChange={(e) => { props.setName(e.target.value) }}
+          disabled={props.loading}
         />
         <div>
           <button
