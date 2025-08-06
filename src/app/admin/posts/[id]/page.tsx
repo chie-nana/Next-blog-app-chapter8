@@ -21,7 +21,8 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
 
   // --- ページ全体のローディングとエラーState ---
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [pageError, setPageError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
   // 利用可能なカテゴリーを保存するStateを追加
   const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
@@ -31,7 +32,7 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
 
   useEffect(() => {
     setLoading(true);
-    setError(null);
+    setPageError(null);
 
     const fetchPost = async () => {
       try {
@@ -55,7 +56,7 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
           throw new Error(errorData.message || "記事の取得に失敗しました");
         }
       } catch (error: any) {
-        setError(error.message || "記事の取得に失敗しました");
+        setPageError(error.message || "記事の取得に失敗しました");
         console.error("記事の取得中にエラーが発生しました:", error);
       } finally {
         setLoading(false);
@@ -91,7 +92,7 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault(); // ページの再読み込みを防ぐ
     setLoading(true); // ローディング状態を開始
-    setError(null); // エラーをリセット
+    setFormError(null); // エラーをリセット
 
     try {
       const dataTOSend = { // サーバーに送るデータ（更新後の投稿内容）
@@ -115,7 +116,7 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
         alert("記事の更新に失敗しました");
       }
     } catch (error: any) { // サーバーとの通信自体が失敗した場合（例: ネットが繋がらない）にここに来る
-      setError(`記事の更新に失敗しました:${error.message || '不明なエラー'}`);
+      setFormError(`記事の更新に失敗しました:${error.message || '不明なエラー'}`);
       console.error("記事の更新中にエラーが発生しました:", error);
     } finally {
       setLoading(false);
@@ -132,7 +133,7 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
     }
 
     setLoading(true);
-    setError(null);
+    setFormError(null);
 
     try {
       const res = await fetch(`/api/admin/posts/${id}`, {
@@ -147,7 +148,7 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
         throw new Error(errorData.message || "記事の削除に失敗しました");
       }
     } catch (error: any) {
-      setError(error.message || "記事の削除に失敗しました");
+      setFormError(error.message || "記事の削除に失敗しました");
       console.error("記事の削除中にエラーが発生しました:", error);
     } finally {
       setLoading(false);
@@ -155,7 +156,7 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
   }
 
   if (loading) { return <p>読み込み中...</p> }
-  if (error) { return <p>エラー: {error}</p> }
+  if (pageError) { return <p>エラー: {pageError}</p> }
 
   return (
     <div className="p-4">
@@ -182,8 +183,6 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
 
         mode="edit" // 編集モード
         onDelete={handleDelete} // 削除関数を渡す
-
-
       />
     </div>
   )

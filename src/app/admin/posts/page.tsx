@@ -43,7 +43,7 @@ export default function AdminPostsPage() {
   return (
     <div className="p-4">
       <div className="flex justify-between items-start mb-8">
-        <h1 className="text-xl font-bold mb-8">記事一覧</h1>
+        <h1 className="text-2xl font-bold mb-8">記事一覧</h1>
         <Link href="/admin/posts/new" className="p-3 bg-[#f26c00d6] rounded-lg py-2 px-5 font-bold text-white">新規作成</Link>
       </div>
       <div>

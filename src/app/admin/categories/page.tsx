@@ -31,8 +31,8 @@ export default function AdminCategoriesPage() {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-xl font-bold">カテゴリー一覧</h1>
+      <div className="flex justify-between items-center mb-8 p-4">
+        <h1 className="text-2xl font-bold">カテゴリー一覧</h1>
         <Link href="/admin/categories/new" className="p-3 bg-[#f26c00d6] rounded-lg py-2  px-5  font-bold text-white">新規作成</Link>
       </div>
 

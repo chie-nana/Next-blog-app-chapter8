@@ -63,7 +63,7 @@ export default function EditCategories({ params }: { params: { id: string } }) {
         alert("カテゴリーの更新に失敗しました");
       }
     } catch (error: any) {// サーバーとの通信自体が失敗した場合（例: ネットが繋がらない）にここに来る
-      setFormError(`カテゴリーの更新に失敗しました:${ error.message || '不明なエラー' }`);
+      setFormError(`カテゴリーの更新に失敗しました:${error.message || '不明なエラー'}`);
       console.error("カテゴリーの更新中にエラーが発生しました:", error);
     } finally {
       setLoading(false);
@@ -73,7 +73,7 @@ export default function EditCategories({ params }: { params: { id: string } }) {
   const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault();// ページの再読み込みを防ぐ
 
-    if(!window.confirm("本当にこのカテゴリーを削除しますか")) {
+    if (!window.confirm("本当にこのカテゴリーを削除しますか")) {
       return; // ユーザーがキャンセルした場合、何もしない
     }
 
@@ -104,7 +104,7 @@ export default function EditCategories({ params }: { params: { id: string } }) {
   if (loading) { return <p>読み込み中...</p> }
   if (pageError) { return <p>エラー: {pageError}</p> }
   return (
-    <div>
+    <div className="p-4">
       <h1 className="text-2xl font-bold mb-8">カテゴリー編集</h1>
       <CategoryForm
         name={editCategoryName}
