@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { CreateCategoryRequestBody } from "@/app/_types/Post";
 
 const prisma = new PrismaClient()
 
@@ -17,9 +18,9 @@ export const GET = async (request: NextRequest) => {
   }
 }
 
-interface CreateCategoryRequestBody {
-  name: string;
-}
+// interface CreateCategoryRequestBody {→型宣言Post.tsへお引越し
+//   name: string;
+// }
 
 // POSTという命名にすることで、POSTリクエストの時にこの関数が呼ばれる
 export const POST = async (request: NextRequest, context: any) => {

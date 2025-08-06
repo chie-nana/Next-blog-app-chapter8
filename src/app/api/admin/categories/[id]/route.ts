@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { UpdateCategoryRequestBody } from "@/app/_types/Post";
 
 const prisma = new PrismaClient();
 
@@ -24,11 +25,6 @@ export const GET = async (
     if (error instanceof Error)
       return NextResponse.json({ status: error.message }, { status: 400 })
   }
-}
-
-
-interface UpdateCategoryRequestBody {
-  name: string;
 }
 
 export const PUT = async (

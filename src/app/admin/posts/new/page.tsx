@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Post } from "@/app/_types/Post";// Post型を使うためにインポート
 import { Category } from "@/app/_types/Post"; // Category型もインポート
 import PostForm from "../_components/PostForm"; // PostForm コンポーネントをインポート
+import { CreatePostRequestBody } from "@/app/_types/Post";
 
 export default function CreatePosts() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function CreatePosts() {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
 
+
   // --- フォーム送信処理 ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,12 +28,19 @@ export default function CreatePosts() {
 
     try {
 
+      const dataToSend: CreatePostRequestBody = {
+        title: newPostTitle,
+        content: newPostContent,
+        thumbnailUrl: newPostThumbnailUrl,
+        categories: newPostCategories,
+      };
+
       const res = await fetch("/api/admin/posts", {
         method: "POST",
         headers: {
-          ContentType: "application/json",
+          'Content-Type': "application/json",
         },
-        body: JSON.stringify({ title: newPostTitle, content: newPostContent, thumbnailUrl: newPostThumbnailUrl, categories: newPostCategories }),
+        body: JSON.stringify(dataToSend),
       });
       // サーバーからの応答をまずJSONとして読み込む（成功でも失敗でも）
       const responseData = await res.json();
