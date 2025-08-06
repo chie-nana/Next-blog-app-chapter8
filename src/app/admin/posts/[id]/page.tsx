@@ -24,11 +24,6 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
   const [pageError, setPageError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
-  // 利用可能なカテゴリーを保存するStateを追加
-  const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
-  //availableCategories のローディングとエラーState (既存のloading/errorを使い回すことも可能だけど、ここでは明示的に)
-  const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
-  const [errorCategories, setErrorCategories] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -62,31 +57,7 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
         setLoading(false);
       }
     };
-
-
-    // 利用可能なカテゴリーの取得処理もここで行う (これはそのまま)
-    setLoadingCategories(true);
-    setErrorCategories(null);
-
-    const fetchAvailableCategories = async () => {
-      try {
-        const res = await fetch("/api/admin/categories");
-        const data = await res.json();
-
-        if (res.ok) {
-          setAvailableCategories(data.categories);
-        } else {
-          throw new Error(data.message || '利用可能なカテゴリーの取得に失敗しました');
-        }
-      } catch (error: any) {
-        setErrorCategories(error.message || '利用可能なカテゴリーの取得中にエラーが発生しました');
-        console.error("カテゴリー一覧取得エラー:", error);
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
     fetchPost();// 記事データを取得する関数を実行
-    fetchAvailableCategories(); // 利用可能なカテゴリーをロードする関数も実行
   }, [id]);
 
   const handleUpdate = async (e: React.FormEvent) => {
@@ -171,18 +142,13 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
         setThumbnailUrl={setEditPostThumbnailUrl}
         categories={editPostCategories}
         setCategories={setEditPostCategories}
-
         onSubmit={handleUpdate}
         loading={loading}
-        availableCategories={availableCategories}
-        setAvailableCategories={setAvailableCategories}
-        loadingCategories={loadingCategories}
-        setLoadingCategories={setLoadingCategories}
-        errorCategories={errorCategories}
-        setErrorCategories={setErrorCategories}
-
+        formError={formError} // ✅ formError を渡す
         mode="edit" // 編集モード
         onDelete={handleDelete} // 削除関数を渡す
+
+
       />
     </div>
   )

@@ -18,39 +18,6 @@ export default function CreatePosts() {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  // 利用可能なカテゴリーを保存するStateを追加
-  const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
-  //availableCategories のローディングとエラーState (既存のloading/errorを使い回すことも可能だけど、ここでは明示的に)
-  const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
-  const [errorCategories, setErrorCategories] = useState<string | null>(null);
-
-  //availableCategories を取得するための useEffect
-  useEffect(() => {
-    setLoadingCategories(true);
-    setErrorCategories(null);
-
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("/api/admin/categories");// カテゴリー一覧APIから取得
-        if (res.ok) {//  成功した場合 (200 OK)
-        // サーバーが { status: "OK", categories: [...] } の形で返すので data.categories を使う
-          const data = await res.json();
-          setAvailableCategories(data.categories);// 取得したカテゴリーをStateにセット
-        } else {
-          const errorData = await res.json();
-          throw new Error(errorData.message || "カテゴリーの取得に失敗しました");
-        }
-      } catch (error: any) {
-        setErrorCategories(error.message || "カテゴリーの取得に失敗しました");
-        console.error("カテゴリーの取得中にエラーが発生しました:", error);
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
-    fetchCategories();
-  }, []);// 初回ロード時のみ実行
-
-
   // --- フォーム送信処理 ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,25 +57,6 @@ export default function CreatePosts() {
     }
   };
 
-
-  // --- 画面表示 ---
-  if (loadingCategories) {
-    return (
-      <div className="p-4">
-        <h1 className="text-xl font-bold mb-8">新規記事作成</h1>
-        <p>カテゴリーを読み込み中...</p>
-      </div>
-    );
-  }
-  if (errorCategories) {
-    return (
-      <div className="p-4">
-        <h1 className="text-xl font-bold mb-8">新規記事作成</h1>
-        <p className="text-red-500">エラー: {errorCategories}</p>
-      </div>
-    );
-  }
-
   // --- コンテンツ表示 ---
   return (
     <div className="p-4">
@@ -125,12 +73,6 @@ export default function CreatePosts() {
         setCategories={setNewPostCategories}
         onSubmit={handleSubmit}
         loading={loading}
-        availableCategories={availableCategories}
-        setAvailableCategories={setAvailableCategories}
-        loadingCategories={loadingCategories}
-        setLoadingCategories={setLoadingCategories}
-        errorCategories={errorCategories}
-        setErrorCategories={setErrorCategories}
         mode="new" // 新規作成モード
       />
       {loading && <p className="text-blue-600 mb-2">記事を作成中...</p>}

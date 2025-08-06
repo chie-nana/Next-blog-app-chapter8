@@ -1,7 +1,7 @@
 // src/app/admin/posts/_components/PostForm.tsx
 
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Category } from "@/app/_types/Post";
 import { Dispatch, SetStateAction } from "react";
 
@@ -16,27 +16,64 @@ interface Props {
   setThumbnailUrl: Dispatch<SetStateAction<string>>; // setThumbnailUrl: (url: string) => void;
   categories: { id: number }[]; // 選択されたカテゴリーのIDの配列
   setCategories: Dispatch<SetStateAction<{ id: number }[]>>; // setCategories: (categories: { id: number }[]) => void;
-
   onSubmit: (e: React.FormEvent) => void; // フォームが送信されたときに実行される関数
   loading: boolean; // ボタンの無効化状態
-  availableCategories: Category[]; // 利用可能なカテゴリーのリスト
-  setAvailableCategories: Dispatch<SetStateAction<Category[]>>; // 利用可能なカテゴリーを更新する関数
-  loadingCategories: boolean; // カテゴリーリストのローディング状態
-  setLoadingCategories: Dispatch<SetStateAction<boolean>>; // カテゴリーリストのローディング状態を更新する関数
-  errorCategories: string | null; // カテゴリーリストのエラー状態
-  setErrorCategories: Dispatch<SetStateAction<string | null>>; // カテゴリーリストのエラー状態を更新する関数
-
   // 編集ページ用 (新規作成ページでは使わないので ? をつける)
   onDelete?: (e: React.FormEvent) => void; // 削除関数（オプション）
   mode?: 'new' | 'edit'; // モード（オプション）
+  formError?: string | null;// フォーム操作時のエラー (オプション)
+
 
 }
 
 const PostForm: React.FC<Props> = (props) => {
   //分割代入でかくと、const PostForm: React.FC<Props> = ({title,setTitle,content,setContent,onSubmit..}) =>{return}
+
+  // ※ 修正点1: カテゴリー取得に必要なStateを PostForm の中で定義する
+  const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
+  const [errorCategories, setErrorCategories] = useState<string | null>(null);
+
+  //availableCategories を取得するための useEffect
+  useEffect(() => {
+    setLoadingCategories(true);
+    setErrorCategories(null);
+
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/admin/categories");// カテゴリー一覧APIから取得
+        if (res.ok) {//成功した場合
+          const data = await res.json();
+          setAvailableCategories(data.categories); // { status: "OK", categories: [...] } の形で返すので data.categories を使う
+        } else {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "カテゴリーの取得に失敗しました");
+        }
+      } catch (error: any) {
+        setErrorCategories(error.message || "カテゴリーの取得に失敗しました")
+        console.error("カテゴリーの取得中にエラーが発生しました", error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }, []);// 初回ロード時のみ実行
+
+  // --- 画面表示 ---
+  if (loadingCategories) {
+    return <p className="text-xl font-bold text-gray-500">カテゴリーを読み込み中...</p>;
+  }
+  if (errorCategories) {
+    return <p className="text-xl font-bold text-red-500">カテゴリー取得エラー: {errorCategories}</p>;
+  }
+  if (availableCategories.length === 0) {
+    return <p className="text-xl font-bold text-gray-500">利用可能なカテゴリーがありません。</p>;
+  }
+
   return (
     <form onSubmit={props.onSubmit}>
 
+      {props.formError && <p className="text-red-500 mb-4">{props.formError}</p>}
       <label htmlFor="postTitle" className="block">タイトル</label>
       <input
         id="postTitle"//htmlForと一致させる
@@ -66,7 +103,7 @@ const PostForm: React.FC<Props> = (props) => {
         type="text"
         className="border p-2 w-full rounded block mb-4"
         value={props.thumbnailUrl}
-        onChange={(e) => { props.setThumbnailUrl(e.target.value)}}
+        onChange={(e) => { props.setThumbnailUrl(e.target.value) }}
         disabled={props.loading}
       />
       {/* カテゴリー選択欄 - ここから新しい方式に置き換える */}
@@ -74,15 +111,15 @@ const PostForm: React.FC<Props> = (props) => {
       {/*  ここから select タグの代わりに div ベースの選択肢を配置  */}
       <div className="flex flex-wrap justify-start gap-2 border rounded p-2 mb-8">
         {/* availableCategories がまだ読み込み中の場合 */}
-        {props.loadingCategories ? (
+        {loadingCategories ? (
           <p className="text-gray-500">カテゴリー読み込み中...</p>
-        ) : props.errorCategories ? (
-          <p className="text-red-500">カテゴリー取得エラー: {props.errorCategories}</p>
-        ) : props.availableCategories.length === 0 ? (
+        ) : errorCategories ? (
+          <p className="text-red-500">カテゴリー取得エラー: {errorCategories}</p>
+        ) : availableCategories.length === 0 ? (
           <p className="text-gray-500">利用可能なカテゴリーがありません。</p>
         ) : (
           // 利用可能なカテゴリーがあれば map で表示
-          props.availableCategories.map((category) => {
+          availableCategories.map((category) => {
             // そのカテゴリーが現在選択されているかチェック
             // editPostCategories は { id: number }[] の形式なので、id を抽出して includes でチェック
             const isSelected = props.categories.some(
