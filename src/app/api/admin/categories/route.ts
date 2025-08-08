@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { CreateCategoryRequestBody } from "@/app/_types";
+import { CreateCategoryRequestBody, GetCategoriesResponse } from "@/app/_types";
 
 const prisma = new PrismaClient()
 
@@ -11,7 +11,8 @@ export const GET = async (request: NextRequest) => {
         createdAt: "desc",
       },
     })
-    return NextResponse.json({ status: "OK", categories }, { status: 200 })
+    // ▼ 修正箇所: NextResponse.jsonに、レスポンスの型 <GetCategoriesResponse> を指定する ▼
+    return NextResponse.json<GetCategoriesResponse>({ status: "OK", categories }, { status: 200 })
   } catch (error) {
     if (error instanceof Error)
       return NextResponse.json({ status: error.message }, { status: 400 })

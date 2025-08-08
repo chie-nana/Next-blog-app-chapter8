@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { UpdateCategoryRequestBody } from "@/app/_types";
+import { GetCategoryResponse, UpdateCategoryRequestBody } from "@/app/_types";
 
 const prisma = new PrismaClient();
 
@@ -20,7 +20,7 @@ export const GET = async (
         { status: "error", message: "カテゴリーが見つかりませんでした。" }, { status: 404 } //  Status Code を 404 にする！
       );
     }
-    return NextResponse.json({ status: "ok", category }, { status: 200 })
+    return NextResponse.json<GetCategoryResponse>({ status: "ok", category }, { status: 200 })
   } catch (error) {
     if (error instanceof Error)
       return NextResponse.json({ status: error.message }, { status: 400 })

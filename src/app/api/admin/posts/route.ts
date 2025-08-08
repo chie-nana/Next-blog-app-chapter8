@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client"
-import { CreatePostRequestBody } from "@/app/_types";
+import { CreatePostRequestBody, GetPostsResponse, Post } from "@/app/_types";
 
 const prisma = new PrismaClient();
 
 export const GET = async (request: NextRequest) => {
   try {
-    const posts = await prisma.post.findMany({
+    const postsFromDb = await prisma.post.findMany({
       include: {
         postCategories: {
           include: {
@@ -23,7 +23,14 @@ export const GET = async (request: NextRequest) => {
         createdAt: "desc",
       },
     })
-    return NextResponse.json({ status: "OK", posts: posts }, { status: 200 })
+    // ▼▼▼修正箇所 ▼▼▼
+    // フロントエンドのPost型に合わせて、Dateオブジェクトを文字列に変換
+    const posts: Post[] = postsFromDb.map(post => ({
+      ...post,
+      createdAt: post.createdAt.toISOString(), // Dateを文字列に変換？？
+    }));
+    // ▲▲▲ 修正箇所 ▲▲▲
+    return NextResponse.json<GetPostsResponse>({ status: "OK", posts: posts }, { status: 200 })
   } catch (error) {
     if (error instanceof Error)
       return NextResponse.json({ status: error.message }, { status: 400 })

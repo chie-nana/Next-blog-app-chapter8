@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { PrismaClient } from "@prisma/client"
-import { UpdatePostRequestBody } from "@/app/_types"
+import { GetPostResponse, Post, UpdatePostRequestBody } from "@/app/_types"
 
 
 const prisma = new PrismaClient()
@@ -10,7 +10,8 @@ export const GET = async (
 ) => {
   const { id } = params
   try {
-    const post = await prisma.post.findUnique({
+    //（データベースから来た投稿データとしてpostFromDbと命名）
+    const postFromDb = await prisma.post.findUnique({
       where: {
         id: parseInt(id),
       },
@@ -27,7 +28,24 @@ export const GET = async (
         },
       },
     })
-    return NextResponse.json({ status: "OK", post: post }, { status: 200 })
+
+    // ▼▼▼ 修正箇所 ▼▼▼
+    // postが見つからなかった場合の処理
+    if (!postFromDb) {
+      return NextResponse.json(
+        { status: "error", message: `ID:${id}の記事が見つかりませんでした。` },
+        { status: 404 }
+      );
+    }
+
+    // createdAt を文字列に変換
+    const post: Post = {
+      ...postFromDb,
+      createdAt: postFromDb.createdAt.toISOString(),
+    };
+    // ▲▲▲修正箇所 ▲▲▲
+
+    return NextResponse.json<GetPostResponse>({ status: "OK", post: post }, { status: 200 })
   } catch (error) {
     if (error instanceof Error)
       return NextResponse.json({ status: error.message }, { status: 400 })

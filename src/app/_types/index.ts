@@ -54,3 +54,27 @@ export interface CategoriesResponseBody {//カテゴリー一覧配列で返る�
   status: string;
   categories: Category[];
 }
+
+// カテゴリー一覧取得APIのレスポンスの型
+export interface GetCategoriesResponse {
+  status: string;
+  categories: Category[];
+}
+
+// 単一カテゴリー（カテゴリー編集）取得APIのレスポンスの型
+export interface GetCategoryResponse {
+  status: string;
+  category: Category;
+}
+
+// 記事一覧取得APIのレスポンスの型
+export interface GetPostsResponse {
+  status: string;
+  posts: Post[];
+}
+
+// 単一記事（記事編集）取得APIのレスポンスの型
+export interface GetPostResponse {
+  status: string;
+  post: Post;
+}
