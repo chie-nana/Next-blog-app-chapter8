@@ -62,6 +62,33 @@ const PostForm: React.FC<Props> = (props) => {
     fetchCategories();
   }, []);// 初回ロード時のみ実行
 
+  // ▼▼▼ レビュー指摘対応 ▼▼▼
+  const handleSelectCategory = (clickedCategory: Category) => {
+    if (props.loading) return; // props.loadingがtrueの場合は処理を実行しない
+
+    // クリックされたカテゴリーが既に選択されているかチェック
+    const isSelected = props.categories.some(
+      (selectedCat) => selectedCat.id === clickedCategory.id
+    );
+
+    // クリックされたカテゴリーを選択/非選択を切り替える
+    if (isSelected) {
+      // もしすでに選択されていたら、リストから削除
+      props.setCategories(
+        props.categories.filter(
+          (selectedCat) => selectedCat.id !== clickedCategory.id
+        )
+      );
+    } else {
+      // もし選択されていなかったら、リストに追加
+      props.setCategories([
+        ...props.categories,
+        { id: parseInt(clickedCategory.id.toString()) }, // 元のコードのロジックをそのまま移動
+      ]);
+    }
+  };
+  // ▲▲▲ レビュー指摘対応 ▲▲▲
+
   // --- 画面表示 ---
   if (loadingCategories) {
     return <p className="text-xl font-bold text-gray-500">カテゴリーを読み込み中...</p>;
@@ -133,25 +160,9 @@ const PostForm: React.FC<Props> = (props) => {
             return (
               <div
                 key={category.id}
-                onClick={() => {
-                  if (props.loading) return;//props.loadingがtrueの場合は処理を実行しない
-                  // クリックされたカテゴリーを選択/非選択を切り替える
-                  if (isSelected) {
-                    // もしすでに選択されていたら、リストから削除
-                    props.setCategories(
-                      props.categories.filter(
-                        (selectedCat) => selectedCat.id !== category.id
-                      )
-                    );
-                  } else {
-                    // もし選択されていなかったら、リストに追加
-                    // category は { id: string, name: string } 型なので、{ id: number } 型に変換して追加
-                    props.setCategories([
-                      ...props.categories,
-                      { id: parseInt(category.id.toString()) }, // 必要に応じて id を数値に変換
-                    ]);
-                  }
-                }}
+                // ▼▼▼ レビュー指摘対応 ▼▼▼
+                // onClickの中では、分離した関数を呼び出すだけにする
+                onClick={() => handleSelectCategory(category)}
                 className={`
                       border border-gray-300 rounded-md py-1 px-3 text-sm cursor-pointer
                       ${isSelected ? "bg-blue-600 text-white border-blue-600" : "bg-gray-100 text-gray-800 hover:bg-gray-200"}
