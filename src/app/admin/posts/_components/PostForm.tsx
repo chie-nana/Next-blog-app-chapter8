@@ -9,7 +9,7 @@ import { Dispatch, SetStateAction } from "react";
 
 // PostForm コンポーネントが外から受け取る情報の「型」を定義
 interface Props {
-  post: Post;
+  post: Post | null;//PostFormがpostデータなし（null）の状態も受け入れられるように、post: Post | nullと修正
   setPost: Dispatch<SetStateAction<Post | null>>;
   // title: string;
   // setTitle: Dispatch<SetStateAction<string>>;  //setTitle:(title:string)=>void; と同一
@@ -99,6 +99,10 @@ const PostForm: React.FC<Props> = (props) => {
   if (availableCategories.length === 0) {
     return <p className="text-xl font-bold text-gray-500">利用可能なカテゴリーがありません。</p>;
   }
+  // ▼ 修正点2: postがnullの場合は何も表示しない（クラッシュ回避）
+  if (!props.post) {
+    return null;
+  }
 
   return (
     <form onSubmit={props.onSubmit}>
@@ -111,8 +115,8 @@ const PostForm: React.FC<Props> = (props) => {
         type="text"
         name="title"
         value={props.post.title}
-        onChange={(e) => { props.setPost({ ...props.post, title: e.target.value }) }}//入力値を更新
-
+        onChange={(e) => props.setPost(prev => prev ? { ...prev, title: e.target.value } : null)}//入力値を更新
+        //（postの最新の状態（prev）をください、もしprevがnullではないなら、それをコピーしtitleを書き換え新しい値にしてください。もしprevがnullだったら、nullのままにしてください」という意味）
         disabled={props.loading}
       />
 
@@ -123,7 +127,8 @@ const PostForm: React.FC<Props> = (props) => {
         className="border p-2 w-full rounded block mb-4"
         rows={5}
         value={props.post.content}
-        onChange={(e) => { props.setPost({ ...props.post, content: e.target.value }) }}
+        // onChange={(e) => { props.setPost({ ...props.post, content: e.target.value }) }}
+        onChange={(e) => props.setPost(prev => prev ? { ...prev, content: e.target.value } : null)}
         disabled={props.loading}
       ></textarea>
 
@@ -134,7 +139,8 @@ const PostForm: React.FC<Props> = (props) => {
         type="text"
         className="border p-2 w-full rounded block mb-4"
         value={props.post.thumbnailUrl}
-        onChange={(e) => { props.setPost({ ...props.post, thumbnailUrl: e.target.value }) }}
+        // onChange={(e) => { props.setPost({ ...props.post, thumbnailUrl: e.target.value }) }}
+        onChange={(e) =>  props.setPost(prev=>prev?{ ...prev, thumbnailUrl: e.target.value }:null) }
         disabled={props.loading}
       />
       {/* カテゴリー選択欄 - ここから新しい方式に置き換える */}

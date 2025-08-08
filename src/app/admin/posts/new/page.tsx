@@ -9,9 +9,18 @@ import { CreatePostRequestBody } from "@/app/_types";
 
 export default function CreatePosts() {
   const router = useRouter();
+  // ▼ 修正箇所 ▼
+  // new/page.tsxが真っ白になったため、PostFormが要求する型に合わせて、useStateの型を `Post | null` に変更
+  //（初期値はオブジェクトのままのためページの表示は影響を受けない）
+  const [post, setPost] = useState<Post | null>({
+    id: 0,
+    title: '',
+    content: '',
+    thumbnailUrl: '',
+    createdAt: '',
+    postCategories: [],
+  });
 
-  // --- フォームの入力値を管理
-  const [post, setPost] = useState<Post | null>(null);
   // const [newPostTitle, setNewPostTitle] = React.useState<string>('');
   // const [newPostContent, setNewPostContent] = React.useState<string>("");
   // const [newPostThumbnailUrl, setNewPostThumbnailUrl] = React.useState<string>("");
@@ -59,14 +68,17 @@ export default function CreatePosts() {
       } else {// サーバーからの応答が "OK" でない場合、エラーとして扱う
         throw new Error(responseData.message || '記事の作成に失敗しました。');
       }
-    } catch (error: any) {
-      setError(`記事の作成中にエラーが発生しました: ${error.message || '不明なエラー'}`);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("予期せぬエラーが発生しました。");
+      }
       console.error("記事の作成中にエラーが発生しました:", error);
     } finally {
       setLoading(false);// ローディング状態を解除
     }
   };
-  if (!post) return;
 
   // --- コンテンツ表示 ---
   return (
