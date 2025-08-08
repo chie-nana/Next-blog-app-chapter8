@@ -14,36 +14,44 @@ interface Props {
   onDelete?: (e: React.FormEvent) => void;
 }
 
-const CategoryForm: React.FC<Props> = (props) => {
-  //分割代入でかくと、const CategoryForm: React.FC<Props> = ({name,setName,loading,...}) =>{return}
+// ▼ 修正箇所: 引数を (props) から ({...}) に変更して分割代入
+const CategoryForm: React.FC<Props> = ({
+  name,
+  setName,
+  loading,
+  onSubmit,
+  error,
+  mode,
+  onDelete
+}) => {
   return (
     <div>
-      <form onSubmit={props.onSubmit} className="space-y-4 mt-4" >
+      <form onSubmit={onSubmit} className="space-y-4 mt-4" >
         <label htmlFor="categoryName" className="block">カテゴリー名</label>
         <input
           id="categoryName"
           className="border p-2 w-full rounded block"
           type="text"
           name="categoryName"
-          value={props.name}
-          onChange={(e) => { props.setName(e.target.value) }}
-          disabled={props.loading}
+          value={name}
+          onChange={(e) => {setName(e.target.value) }}
+          disabled={loading}
         />
         <div>
           <button
             type="submit"
             className="bg-blue-700 text-white py-2 px-3 rounded font-bold"
-            disabled={props.loading} // 送信中はボタンを無効化
+            disabled={loading} // 送信中はボタンを無効化
           >
-            {props.mode === "new" ? "作成" : "更新"}
+            {mode === "new" ? "作成" : "更新"}
           </button>
           {/* mode が 'edit' であり、かつ onDelete という関数が渡されてきた場合にだけ、ボタンが表示 */}
-          {props.mode === "edit" && props.onDelete && (
+          {mode === "edit" && onDelete && (
             <button
               type="button"
-              onClick={props.onDelete}
+              onClick={onDelete}
               className="bg-red-600 text-white py-2 px-3 rounded font-bold ml-3 mt-3"
-              disabled={props.loading}
+              disabled={loading}
             >
               削除
             </button>
