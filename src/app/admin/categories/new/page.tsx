@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import CategoryForm from "../_components/CategoryForm"; // CategoryForm コンポーネントをインポート
-import { CreateCategoryRequestBody } from "@/app/_types/Post";
+import { CreateCategoryRequestBody } from "@/app/_types";
 
 export default function CreateCategories() {//※型の有無要確認
   const [newCategoryName, setNewCategoryName] = useState<string>('');
@@ -18,7 +18,7 @@ export default function CreateCategories() {//※型の有無要確認
     setLoading(true); // フォーム送信が始まるので、loading の情報ボードを「true」（作成中）にする
     setError(null);   // 新しい送信なので、以前のエラーメッセージがあればクリアする
 
-    const dataToSend:CreateCategoryRequestBody = { name: newCategoryName }
+    const dataToSend: CreateCategoryRequestBody = { name: newCategoryName }
     try {
       const res = await fetch("/api/admin/categories", {
         // 第2引数:HTTPリクエストを送信するための関数

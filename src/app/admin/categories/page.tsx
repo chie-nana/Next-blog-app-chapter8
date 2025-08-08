@@ -1,7 +1,7 @@
 "use client"; // クライアントサイドで実行
 
 import React from "react";
-import { CategoriesResponseBody, Category } from "@/app/_types/Post";
+import { CategoriesResponseBody, Category } from "@/app/_types";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 

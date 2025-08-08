@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import CategoryForm from "../_components/CategoryForm"
-import { CategoryResponseBody, UpdateCategoryRequestBody } from "@/app/_types/Post";
+import { CategoryResponseBody, UpdateCategoryRequestBody } from "@/app/_types";
 
 export default function EditCategories({ params }: { params: { id: string } }) {
   const { id } = params;//IDを取得

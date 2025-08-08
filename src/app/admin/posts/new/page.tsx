@@ -2,21 +2,21 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Post } from "@/app/_types/Post";// Post型を使うためにインポート
-import { Category } from "@/app/_types/Post"; // Category型もインポート
+import { Post } from "@/app/_types";// Post型を使うためにインポート
+import { Category } from "@/app/_types"; // Category型もインポート
 import PostForm from "../_components/PostForm"; // PostForm コンポーネントをインポート
-import { CreatePostRequestBody } from "@/app/_types/Post";
+import { CreatePostRequestBody } from "@/app/_types";
 
 export default function CreatePosts() {
   const router = useRouter();
 
   // --- フォームの入力値を管理
-   const [post, setPost] = useState<Post | null>(null);
+  const [post, setPost] = useState<Post | null>(null);
   // const [newPostTitle, setNewPostTitle] = React.useState<string>('');
   // const [newPostContent, setNewPostContent] = React.useState<string>("");
   // const [newPostThumbnailUrl, setNewPostThumbnailUrl] = React.useState<string>("");
   // newPostCategories の型を { id: number }[] に。（バックエンドが { id: number }[] の形式の配列）
-  const [newPostCategories, setNewPostCategories] = React.useState<{id:number}[]>([]);
+  const [newPostCategories, setNewPostCategories] = React.useState<{ id: number }[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
 

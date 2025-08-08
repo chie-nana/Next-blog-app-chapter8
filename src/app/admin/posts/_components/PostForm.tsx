@@ -2,7 +2,7 @@
 
 "use client";
 import React, { useState, useEffect } from "react";
-import { Category, Post } from "@/app/_types/Post";
+import { Category, Post } from "@/app/_types";
 import { Dispatch, SetStateAction } from "react";
 
 
@@ -84,7 +84,7 @@ const PostForm: React.FC<Props> = (props) => {
         type="text"
         name="title"
         value={props.post.title}
-        onChange={(e) => { props.setPost({...props.post,title:e.target.value}) }}//入力値を更新
+        onChange={(e) => { props.setPost({ ...props.post, title: e.target.value }) }}//入力値を更新
 
         disabled={props.loading}
       />
@@ -96,7 +96,7 @@ const PostForm: React.FC<Props> = (props) => {
         className="border p-2 w-full rounded block mb-4"
         rows={5}
         value={props.post.content}
-        onChange={(e) => { props.setPost({ ...props.post,content:e.target.value }) }}
+        onChange={(e) => { props.setPost({ ...props.post, content: e.target.value }) }}
         disabled={props.loading}
       ></textarea>
 

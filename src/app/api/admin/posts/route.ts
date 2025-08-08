@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client"
-import { CreatePostRequestBody } from "@/app/_types/Post";
+import { CreatePostRequestBody } from "@/app/_types";
 
 const prisma = new PrismaClient();
 

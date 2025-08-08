@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Post } from "@/app/_types/Post";
+import { Post } from "@/app/_types";
 import Link from "next/link";
 
 export default function AdminPostsPage() {
@@ -17,7 +17,7 @@ export default function AdminPostsPage() {
 
     const fetchPosts = async () => {
       try {
-        const res= await fetch("/api/admin/posts");
+        const res = await fetch("/api/admin/posts");
         if (res.ok) {
           const data: { posts: Post[] } = await res.json();
           setPosts(data.posts);
@@ -55,14 +55,14 @@ export default function AdminPostsPage() {
           <p>記事が見つかりませんでした</p>
         ) : (
           <ul>
-              {posts.map((post) => (
-                <li key={post.id}>
-                  <Link href={`/admin/posts/${post.id}`} className="block hover:bg-[#ccdee7] p-5 border-b border-gray-200">
-                    <h2 className="font-bold text-xl">{post.title}</h2>
-                    <p className="text-gray-600">{post.content.substring(0, 100)}</p>
-                  </Link>
-                </li>
-              ))}
+            {posts.map((post) => (
+              <li key={post.id}>
+                <Link href={`/admin/posts/${post.id}`} className="block hover:bg-[#ccdee7] p-5 border-b border-gray-200">
+                  <h2 className="font-bold text-xl">{post.title}</h2>
+                  <p className="text-gray-600">{post.content.substring(0, 100)}</p>
+                </Link>
+              </li>
+            ))}
           </ul>
         )}
       </div>

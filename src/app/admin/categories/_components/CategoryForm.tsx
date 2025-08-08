@@ -1,7 +1,7 @@
 "use client"; // クライアントサイドで実行
 
 import React from "react";
-import { Category } from "@/app/_types/Post";
+import { Category } from "@/app/_types";
 import { Dispatch, SetStateAction } from "react";
 
 interface Props {

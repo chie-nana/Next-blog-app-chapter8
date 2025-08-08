@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Post } from "@/app/_types/Post";
+import { Post } from "@/app/_types";
 
 const Home = () => {
   const [posts, setPosts] = useState<Post[]>([])

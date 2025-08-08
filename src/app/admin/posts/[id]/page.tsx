@@ -3,8 +3,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Post, UpdatePostRequestBody } from "@/app/_types/Post"; // Post型を使うために
-import { Category } from "@/app/_types/Post"; // Category型もインポート！
+import { Post, UpdatePostRequestBody } from "@/app/_types"; // Post型を使うために
+import { Category } from "@/app/_types"; // Category型もインポート！
 import PostForm from "../_components/PostForm"; // PostForm コンポーネントをインポート
 
 export default function EditPosts({ params }: { params: { id: string } }) { //  URLパラメータを受け取る

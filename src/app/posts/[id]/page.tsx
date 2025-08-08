@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Post } from "@/app/_types/Post";
+import { Post } from "@/app/_types";
 import Image from "next/image";
 
 export const PostDetail: React.FC = () => {
