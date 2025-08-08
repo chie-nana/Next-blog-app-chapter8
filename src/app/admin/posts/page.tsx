@@ -17,16 +17,20 @@ export default function AdminPostsPage() {
 
     const fetchPosts = async () => {
       try {
-        const res = await fetch("/api/admin/posts");
+        const res= await fetch("/api/admin/posts");
         if (res.ok) {
-          const data = await res.json();
+          const data: { posts: Post[] } = await res.json();
           setPosts(data.posts);
         } else {
           const errorData = await res.json();
-          throw new Error(errorData.message || "記事の取得に失敗しました");
+          throw new Error(errorData.status || "記事の取得に失敗しました");
         }
-      } catch (error: any) {
-        setError(error.message || "記事の取得に失敗しました");
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("予期せぬエラーが発生しました");
+        }
         console.error("記事の取得中にエラーが発生しました:", error);
       }
       finally {

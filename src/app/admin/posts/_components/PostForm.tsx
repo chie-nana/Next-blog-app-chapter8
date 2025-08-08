@@ -2,18 +2,21 @@
 
 "use client";
 import React, { useState, useEffect } from "react";
-import { Category } from "@/app/_types/Post";
+import { Category, Post } from "@/app/_types/Post";
 import { Dispatch, SetStateAction } from "react";
+
 
 
 // PostForm コンポーネントが外から受け取る情報の「型」を定義
 interface Props {
-  title: string;
-  setTitle: Dispatch<SetStateAction<string>>;  //setTitle:(title:string)=>void; と同一
-  content: string;
-  setContent: Dispatch<SetStateAction<string>>;//  setContent: (content: string) => void;
-  thumbnailUrl: string;
-  setThumbnailUrl: Dispatch<SetStateAction<string>>; // setThumbnailUrl: (url: string) => void;
+  post: Post;
+  setPost: Dispatch<SetStateAction<Post | null>>;
+  // title: string;
+  // setTitle: Dispatch<SetStateAction<string>>;  //setTitle:(title:string)=>void; と同一
+  // content: string;
+  // setContent: Dispatch<SetStateAction<string>>;//  setContent: (content: string) => void;
+  // thumbnailUrl: string;
+  // setThumbnailUrl: Dispatch<SetStateAction<string>>; // setThumbnailUrl: (url: string) => void;
   categories: { id: number }[]; // 選択されたカテゴリーのIDの配列
   setCategories: Dispatch<SetStateAction<{ id: number }[]>>; // setCategories: (categories: { id: number }[]) => void;
   onSubmit: (e: React.FormEvent) => void; // フォームが送信されたときに実行される関数
@@ -80,8 +83,9 @@ const PostForm: React.FC<Props> = (props) => {
         className="border p-2 w-full rounded block mb-4"
         type="text"
         name="title"
-        value={props.title}
-        onChange={(e) => { props.setTitle(e.target.value) }}//入力値を更新
+        value={props.post.title}
+        onChange={(e) => { props.setPost({...props.post,title:e.target.value}) }}//入力値を更新
+
         disabled={props.loading}
       />
 
@@ -91,8 +95,8 @@ const PostForm: React.FC<Props> = (props) => {
         name="content"
         className="border p-2 w-full rounded block mb-4"
         rows={5}
-        value={props.content}
-        onChange={(e) => { props.setContent(e.target.value) }}
+        value={props.post.content}
+        onChange={(e) => { props.setPost({ ...props.post,content:e.target.value }) }}
         disabled={props.loading}
       ></textarea>
 
@@ -102,8 +106,8 @@ const PostForm: React.FC<Props> = (props) => {
         name="thumbnailUrl"
         type="text"
         className="border p-2 w-full rounded block mb-4"
-        value={props.thumbnailUrl}
-        onChange={(e) => { props.setThumbnailUrl(e.target.value) }}
+        value={props.post.thumbnailUrl}
+        onChange={(e) => { props.setPost({ ...props.post, thumbnailUrl: e.target.value }) }}
         disabled={props.loading}
       />
       {/* カテゴリー選択欄 - ここから新しい方式に置き換える */}
@@ -132,7 +136,6 @@ const PostForm: React.FC<Props> = (props) => {
                 onClick={() => {
                   if (props.loading) return;//props.loadingがtrueの場合は処理を実行しない
                   // クリックされたカテゴリーを選択/非選択を切り替える
-                  const currentSelectedIds = props.categories.map(cat => cat.id); // 現在選択されているIDのリスト
                   if (isSelected) {
                     // もしすでに選択されていたら、リストから削除
                     props.setCategories(

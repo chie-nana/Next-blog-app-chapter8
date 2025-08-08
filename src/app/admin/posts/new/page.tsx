@@ -11,9 +11,10 @@ export default function CreatePosts() {
   const router = useRouter();
 
   // --- フォームの入力値を管理
-  const [newPostTitle, setNewPostTitle] = React.useState<string>('');
-  const [newPostContent, setNewPostContent] = React.useState<string>("");
-  const [newPostThumbnailUrl, setNewPostThumbnailUrl] = React.useState<string>("");
+   const [post, setPost] = useState<Post | null>(null);
+  // const [newPostTitle, setNewPostTitle] = React.useState<string>('');
+  // const [newPostContent, setNewPostContent] = React.useState<string>("");
+  // const [newPostThumbnailUrl, setNewPostThumbnailUrl] = React.useState<string>("");
   // newPostCategories の型を { id: number }[] に。（バックエンドが { id: number }[] の形式の配列）
   const [newPostCategories, setNewPostCategories] = React.useState<{id:number}[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -26,12 +27,14 @@ export default function CreatePosts() {
     setLoading(true);
     setError(null);
 
+    if (!post) return;
+
     try {
 
       const dataToSend: CreatePostRequestBody = {
-        title: newPostTitle,
-        content: newPostContent,
-        thumbnailUrl: newPostThumbnailUrl,
+        title: post.title,
+        content: post.content,
+        thumbnailUrl: post.thumbnailUrl,
         categories: newPostCategories,
       };
 
@@ -50,9 +53,7 @@ export default function CreatePosts() {
 
         alert("記事が作成されました");
         // フォームをリセットする
-        setNewPostTitle("");
-        setNewPostContent("");
-        setNewPostThumbnailUrl("");
+        setPost(null);
         setNewPostCategories([]);
         router.push("/admin/posts");// 記事一覧ページへリダイレクト
       } else {// サーバーからの応答が "OK" でない場合、エラーとして扱う
@@ -65,6 +66,7 @@ export default function CreatePosts() {
       setLoading(false);// ローディング状態を解除
     }
   };
+  if (!post) return;
 
   // --- コンテンツ表示 ---
   return (
@@ -72,12 +74,14 @@ export default function CreatePosts() {
       <h1 className="text-xl font-bold mb-8">新規記事作成</h1>
       {/* PostForm コンポーネントを利用してフォームを表示 */}
       <PostForm
-        title={newPostTitle}
-        setTitle={setNewPostTitle}
-        content={newPostContent}
-        setContent={setNewPostContent}
-        thumbnailUrl={newPostThumbnailUrl}
-        setThumbnailUrl={setNewPostThumbnailUrl}
+        post={post}
+        setPost={setPost}
+        // title={newPostTitle}
+        // setTitle={setNewPostTitle}
+        // content={newPostContent}
+        // setContent={setNewPostContent}
+        // thumbnailUrl={newPostThumbnailUrl}
+        // setThumbnailUrl={setNewPostThumbnailUrl}
         categories={newPostCategories}
         setCategories={setNewPostCategories}
         onSubmit={handleSubmit}

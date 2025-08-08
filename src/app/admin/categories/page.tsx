@@ -1,7 +1,7 @@
 "use client"; // クライアントサイドで実行
 
 import React from "react";
-import { Category } from "@/app/_types/Post";
+import { CategoriesResponseBody, Category } from "@/app/_types/Post";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -15,7 +15,7 @@ export default function AdminCategoriesPage() {
     const fetchCategories = async () => {
       try {
         const res = await fetch('/api/admin/categories');
-        const data = await res.json();
+        const data: CategoriesResponseBody = await res.json();
         setCategories(data.categories);
       } catch (error) {
         setError("カテゴリーの取得に失敗しました");
