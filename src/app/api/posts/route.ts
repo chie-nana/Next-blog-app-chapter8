@@ -1,5 +1,8 @@
+//api/posts/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { GetPostsResponse, Post } from "@/app/_types";
 
 
 const prisma = new PrismaClient();
@@ -8,7 +11,8 @@ const prisma = new PrismaClient();
 export const GET = async (request: NextRequest) => {
   try {
     // Postの一覧をDBから取得
-    const posts = await prisma.post.findMany({
+    // データベースから取得したデータを一時的な変数に格納します
+    const postsFromDb = await prisma.post.findMany({
       include: {
         // カテゴリーも含めて取得
         postCategories: {
@@ -29,8 +33,15 @@ export const GET = async (request: NextRequest) => {
       }, // ← orderByオブジェクト終了
     })// ← findManyの()終了
 
+
+    // ▼ 修正点2: フロントエンドのPost型に合わせて、Dateオブジェクトを文字列に変換
+    const posts: Post[] = postsFromDb.map(post => ({
+      ...post,
+      createdAt: post.createdAt.toISOString(), // Dateを文字列に変換
+    }));
+
     // レスポンスを返す
-    return NextResponse.json({ status: "OK", posts: posts }, { status: 200 })
+    return NextResponse.json<GetPostsResponse>({ status: "OK", posts: posts }, { status: 200 })
   } catch (error) {
     if (error instanceof Error)
       return NextResponse.json({ status: error.message }, { status: 400 })

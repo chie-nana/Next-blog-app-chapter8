@@ -1,6 +1,8 @@
+//記事作成API  src/app/api/admin/posts/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client"
-import { CreatePostRequestBody, GetPostsResponse, Post } from "@/app/_types";
+import { CreatePostRequestBody, CreatePostResponse, GetPostsResponse, Post } from "@/app/_types";
 
 const prisma = new PrismaClient();
 
@@ -47,7 +49,8 @@ export const GET = async (request: NextRequest) => {
 // }
 
 // POSTという命名にすることで、POSTリクエストの時にこの関数が呼ばれる
-export const POST = async (request: NextRequest, context: any) => {
+// ▼ 修正: 使われていない `context: any` を削除
+export const POST = async (request: NextRequest) => {
   try {
     // リクエストのbodyを取得
     const body = await request.json()
@@ -75,7 +78,8 @@ export const POST = async (request: NextRequest, context: any) => {
     }
 
     // レスポンスを返す
-    return NextResponse.json({
+    // ▼ 修正箇所 ▼
+    return NextResponse.json<CreatePostResponse>({
       status: "OK",
       message: "作成しました",
       id: data.id,

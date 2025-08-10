@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Post } from "@/app/_types";
+import { GetPostsResponse, Post } from "@/app/_types";
 import Link from "next/link";
 
 export default function AdminPostsPage() {
@@ -19,7 +19,8 @@ export default function AdminPostsPage() {
       try {
         const res = await fetch("/api/admin/posts");
         if (res.ok) {
-          const data: { posts: Post[] } = await res.json();
+          // { posts: Post[] }からより具体的に修正
+          const data: GetPostsResponse  = await res.json();
           setPosts(data.posts);
         } else {
           const errorData = await res.json();

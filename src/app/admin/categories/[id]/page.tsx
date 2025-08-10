@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import CategoryForm from "../_components/CategoryForm"
-import { CategoryResponseBody, UpdateCategoryRequestBody } from "@/app/_types";
+import { GetCategoryResponse, UpdateCategoryRequestBody } from "@/app/_types";
 
 export default function EditCategories({ params }: { params: { id: string } }) {
   const { id } = params;//IDを取得
@@ -24,7 +24,7 @@ export default function EditCategories({ params }: { params: { id: string } }) {
       try {
         const res = await fetch(`/api/admin/categories/${id}`);
         if (res.ok) {// もし成功したら
-          const data: { category: CategoryResponseBody } = await res.json();// 成功したデータ（JSON）を読み取る
+          const data:GetCategoryResponse  = await res.json();// 成功したデータ（JSON）を読み取る
           setEditCategoryName(data.category.name);//取得したデータを State にセットする処理
         } else {// もし失敗したら（res.ok が false なら）
           const errorData = await res.json();

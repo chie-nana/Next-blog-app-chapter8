@@ -2,7 +2,7 @@
 
 "use client";
 import React, { useState, useEffect } from "react";
-import { Category, Post } from "@/app/_types";
+import { Category, GetCategoriesResponse, Post } from "@/app/_types";
 import { Dispatch, SetStateAction } from "react";
 
 
@@ -56,14 +56,18 @@ const PostForm: React.FC<Props> = ({
       try {
         const res = await fetch("/api/admin/categories");// カテゴリー一覧APIから取得
         if (res.ok) {//成功した場合
-          const data = await res.json();
+          const data: GetCategoriesResponse = await res.json();
           setAvailableCategories(data.categories); // { status: "OK", categories: [...] } の形で返すので data.categories を使う
         } else {
           const errorData = await res.json();
           throw new Error(errorData.message || "カテゴリーの取得に失敗しました");
         }
-      } catch (error: any) {
-        setErrorCategories(error.message || "カテゴリーの取得に失敗しました")
+      } catch(error: unknown) { // anyをunknownに修正
+        if (error instanceof Error) {
+          setErrorCategories(error.message);
+        } else {
+          setErrorCategories("予期せぬエラーが発生しました");
+        }
         console.error("カテゴリーの取得中にエラーが発生しました", error);
       } finally {
         setLoadingCategories(false);

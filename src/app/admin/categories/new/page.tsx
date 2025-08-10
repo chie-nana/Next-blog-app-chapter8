@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import CategoryForm from "../_components/CategoryForm"; // CategoryForm コンポーネントをインポート
-import { CreateCategoryRequestBody } from "@/app/_types";
+import { CreateCategoryRequestBody, CreateCategoryResponse } from "@/app/_types";
 
 export default function CreateCategories() {//※型の有無要確認
   const [newCategoryName, setNewCategoryName] = useState<string>('');
@@ -24,20 +24,25 @@ export default function CreateCategories() {//※型の有無要確認
         // 第2引数:HTTPリクエストを送信するための関数
         method: "POST",
         headers: {
-          ContentType: "application/json", //json形式で送る
+          "Content-Type": "application/json", //json形式で送る
         },
         body: JSON.stringify(dataToSend),
       });
+      const responseData: CreateCategoryResponse = await res.json();
       if (res.ok) {
         alert("カテゴリーが作成されました");
         setNewCategoryName(''); // 入力フィールドをクリア
         router.push("/admin/categories"); // 作成成功後、カテゴリー一覧ページにリダイレクト
       } else {
-        alert(`カテゴリーの作成に失敗しました`);
+        // ▼ 修正箇所: APIからのエラーメッセージを使う
+        throw new Error(responseData.message || 'カテゴリーの作成に失敗しました。');
       }
-
-    } catch (error: any) {
-      setError("カテゴリーの作成に失敗しました");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("予期せぬエラーが発生しました。");
+      }
       console.error("カテゴリーの作成中にエラーが発生しました:", error);
     } finally {
       setLoading(false);

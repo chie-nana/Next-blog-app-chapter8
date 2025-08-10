@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { GetCategoryResponse, UpdateCategoryRequestBody } from "@/app/_types";
+import { GetCategoryResponse, UpdateCategoryRequestBody, UpdateCategoryResponse } from "@/app/_types";
 
 const prisma = new PrismaClient();
 
@@ -43,7 +43,8 @@ export const PUT = async (
         name,
       },
     })
-    return NextResponse.json({ status: "OK", category }, { status: 200 })
+    // ▼ 修正UpdateCategoryResponse
+    return NextResponse.json<UpdateCategoryResponse>({ status: "OK", category }, { status: 200 })
   } catch (error) {
     if (error instanceof Error)
       return NextResponse.json({ status: error.message }, { status: 400 })

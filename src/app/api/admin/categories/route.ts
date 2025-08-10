@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { CreateCategoryRequestBody, GetCategoriesResponse } from "@/app/_types";
+import { CreateCategoryRequestBody, CreateCategoryResponse, GetCategoriesResponse } from "@/app/_types";
 
 const prisma = new PrismaClient()
 
@@ -36,7 +36,7 @@ export const POST = async (request: NextRequest, context: any) => {
         name,
       },
     })
-    return NextResponse.json({
+    return NextResponse.json<CreateCategoryResponse>({
       status: "OK",
       message: "カテゴリーを作成しました",
       id: data.id,

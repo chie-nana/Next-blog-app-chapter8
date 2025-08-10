@@ -1,11 +1,10 @@
 // src/app/admin/posts/new/page.tsx
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Post } from "@/app/_types";// Post型を使うためにインポート
-import { Category } from "@/app/_types"; // Category型もインポート
+import { Post, CreatePostRequestBody, CreatePostResponse } from "@/app/_types";// Post型を使うためにインポート
 import PostForm from "../_components/PostForm"; // PostForm コンポーネントをインポート
-import { CreatePostRequestBody } from "@/app/_types";
+import {  } from "@/app/_types";
 
 export default function CreatePosts() {
   const router = useRouter();
@@ -55,7 +54,7 @@ export default function CreatePosts() {
         body: JSON.stringify(dataToSend),
       });
       // サーバーからの応答をまずJSONとして読み込む（成功でも失敗でも）
-      const responseData = await res.json();
+      const responseData: CreatePostResponse = await res.json();
       // サーバーの応答の 'status' プロパティが "OK" かどうかで判断する
       if (responseData.status === "OK") {
 

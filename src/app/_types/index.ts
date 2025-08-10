@@ -1,3 +1,6 @@
+// ========================================================================
+// 1. データモデルの型 (アプリケーションの核となるデータの形)
+// ========================================================================
 export type Post = {
   id: number;
   title: string;
@@ -12,18 +15,26 @@ export interface Category {
   name: string;
 }
 
+// ========================================================================
+// 2. APIリクエストの型 (フロントエンドからサーバーへ送るデータ)
+// ========================================================================
 // Requestリクエスト(送る時)、フロント側ではdataToSendの型
-//1.カテゴリー新規作成（categories/new）
+
+
+// --- カテゴリー関連 ---
+//カテゴリー新規作成（categories/new）時のリクエストボディ */
 export interface CreateCategoryRequestBody {
   name: string;
 }
 
-//2.カテゴリー更新（カテゴリー編集）(categories/[id])
+//カテゴリー更新（カテゴリー編集）(categories/[id])時のリクエストボディ */
 export interface UpdateCategoryRequestBody { ///api/admin/categories/[id]/route.ts ファイルから引越し
   name: string;
 }
 
-//新規記事作成(posts/new)
+// --- 記事関連 ---
+
+//新規記事作成(posts/new)時のリクエストボディ */
 export interface CreatePostRequestBody {///api/admin/posts/route.ts ファイルから引越し
   title: string
   content: string
@@ -40,41 +51,76 @@ export interface UpdatePostRequestBody {///api/admin/posts/[id]/route.ts ファ�
 }
 
 
+// ========================================================================
+// 3. APIレスポンスの型 (サーバーからフロントエンドへ返ってくるデータ)
+// ========================================================================
 
-// Responseレスポンス(取得する時)、バックエンドからのレスポンス、フロント側ではdataの型
-//2.カテゴリー情報取得(categories/[id])
-export interface CategoryResponseBody {
-  // APIは { "status": "ok", "category": Category } の形で返している
-  name: string;
-}
-
-//カテゴリー一覧(レスポンス）
-// // APIは { "status": "OK", "categories": Category[] } の形で返している
-export interface CategoriesResponseBody {//カテゴリー一覧配列で返るため複数
+// 【GET】カテゴリー一覧取得APIのレスポンスの型
+export interface GetCategoriesResponse {//カテゴリー一覧配列で返るため複数
   status: string;
   categories: Category[];
 }
 
-// カテゴリー一覧取得APIのレスポンスの型
-export interface GetCategoriesResponse {
-  status: string;
-  categories: Category[];
-}
-
-// 単一カテゴリー（カテゴリー編集）取得APIのレスポンスの型
+// 【GET】単一カテゴリー取得APIのレスポンスの型
 export interface GetCategoryResponse {
   status: string;
   category: Category;
 }
 
-// 記事一覧取得APIのレスポンスの型
+// 【POST】カテゴリー作成APIのレスポンスの型
+export interface CreateCategoryResponse {
+  status: string;
+  message: string;
+  id: number;
+}
+
+// 【PUT】単一カテゴリー更新APIのレスポンス
+export interface UpdateCategoryResponse {
+  status: string;
+  category: Category;
+}
+
+
+// --- 記事関連 ---
+/** 【GET】記事一覧取得APIのレスポンス */
 export interface GetPostsResponse {
   status: string;
   posts: Post[];
 }
 
-// 単一記事（記事編集）取得APIのレスポンスの型
+/** 【GET】単一記事取得APIのレスポンス */
 export interface GetPostResponse {
   status: string;
   post: Post;
 }
+
+/** 【POST】記事作成APIのレスポンス */
+export interface CreatePostResponse {
+  status: string;
+  message: string;
+  id: number;
+}
+
+/** 【PUT】単一記事（記事編集）更新APIのレスポンス */
+export interface UpdatePostResponse {
+  status: string;
+  post: Post;
+}
+
+
+
+// ここから不要になるはず
+// Responseレスポンス(取得する時)、バックエンドからのレスポンス、フロント側ではdataの型
+//カテゴリー情報取得(categories/[id])
+// export interface CategoryResponseBody {
+//   // APIは { "status": "ok", "category": Category } の形で返している
+//   name: string;
+// }
+
+
+// //カテゴリー一覧取得(レスポンス）
+// // // APIは { "status": "OK", "categories": Category[] } の形で返している
+// export interface CategoriesResponseBody {//カテゴリー一覧配列で返るため複数
+//   status: string;
+//   categories: Category[];
+// }
