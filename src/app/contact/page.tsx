@@ -1,7 +1,8 @@
+//app/contact/page.tsx
+
 "use client"
 
 import React, { useState } from 'react';
-import classes from '../contact/Contact.module.css';
 
 // 型定義
 type ContactData = {
@@ -83,13 +84,13 @@ const Contact: React.FC = () => {
     setContactData({ name: '', email: '', message: '' });
   };
   return (
-    <div className={classes.contactContainer}>
-      <h2 className={classes.h2}>問い合わせフォーム</h2>
+    <div className="max-w-[50.00rem] my-10 m-auto py-0 px-8">
+      <h2 className="mb-12 text-2xl font-semibold">問い合わせフォーム</h2>
       <form onSubmit={handleSubmit}>
 
-        <div className={classes.formItem}>
-          <label className={classes.label} htmlFor="name">お名前</label>
-          <div className={classes.formChild}>
+        <div className="flex mb-10">
+          <label className="w-64" htmlFor="name">お名前</label>
+          <div className="flex flex-col w-full">
             <input
               type="text"
               id="name"
@@ -97,26 +98,28 @@ const Contact: React.FC = () => {
               value={contactData.name}
               onChange={handleChange}
               disabled={isSubmitting}
+              className='p-5 rounded w-[calc(100%-40px)] border-[1.5px] border-[#bababa]'
             />
-            {errors.name && <p className={classes.error}>{errors.name}</p>}
+            {errors.name && <p className="mb-8 text-[0.63rem] text-red">{errors.name}</p>}
           </div>
         </div>
-        <div className={classes.formItem}>
-          <label className={classes.label} htmlFor="email">メールアドレス</label>
-          <div className={classes.formChild}>
+        <div className="flex mb-10">
+          <label className="w-64" htmlFor="email">メールアドレス</label>
+          <div className="flex flex-col w-full">
             <input
               type="email"
               id="email"
               value={contactData.email}
               onChange={handleChange}
               disabled={isSubmitting}
+              className='p-5 rounded w-[calc(100%-40px)] border-[1.5px] border-[#bababa]'
             />
-            {errors.email && <p className={classes.error}>{errors.email}</p>}
+            {errors.email && <p className="mb-8 text-[0.63rem] text-red">{errors.email}</p>}
           </div>
         </div>
-        <div className={classes.formItem}>
-          <label className={classes.label} htmlFor="message">本文</label>
-          <div className={classes.formChild}>
+        <div className="flex mb-10">
+          <label className="w-64" htmlFor="message">本文</label>
+          <div className="flex flex-col w-full">
             <textarea
               id="message"
               maxLength={500}
@@ -124,22 +127,23 @@ const Contact: React.FC = () => {
               onChange={handleChange}
               disabled={isSubmitting}
               rows={10}
-              className={classes.textarea}
+              className="rounded w-[calc(100%-20px)] p-3 border-[1.5px] border-[#bababa]"
             />
-            {errors.message && <p className={classes.error}>{errors.message}</p>}
+            {errors.message && <p className="mb-8 text-[0.63rem] text-red">{errors.message}</p>}
           </div>
         </div>
-        <div className={classes.btnContainer}>
+        <div className="flex items-center justify-center gap-5">
           <input
             type="submit"
             value="送信"
             disabled={isSubmitting}
+            className='w-24 p-3 text-[#fff] font-black rounded-xl bg-black'
           />
           <button
             type="button"
             onClick={handleClear}
             disabled={isSubmitting}
-            className={classes.clearBtn}
+            className="w-24 p-3 font-black rounded-xl bg-gray-200 text-gray-800"
           >クリア</button>
         </div>
       </form>

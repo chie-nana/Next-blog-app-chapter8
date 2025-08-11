@@ -1,26 +1,21 @@
+//app/page.tsx
 "use client"
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { MicroCmsPost } from "@/app/_types/MicroCmsPost";
-import classes from "@/app/_styles/Home.module.css"
+import { Post } from "@/app/_types";
 
 const Home = () => {
-  const [posts, setPosts] = useState<MicroCmsPost[]>([])
+  const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetcher = async () => {
       try {
-        const res = await fetch('https://4zmimxorag.microcms.io/api/v1/posts', {// 管理画面で取得したエンドポイントを入力してください。
-          headers: {// fetch関数の第二引数にheadersを設定でき、その中にAPIキーを設定します。
-            'X-MICROCMS-API-KEY': process.env
-              .NEXT_PUBLIC_MICROCMS_API_KEY as string, // 管理画面で取得したAPIキーを入力してください。
-          },
-        })
-        const { contents } = await res.json()
-        setPosts(contents)
+        const res = await fetch('/api/posts')// Nextjsの自作APIへ変更
+        const { posts } = await res.json()
+        setPosts(posts)
       } catch (error: any) {
         setError(error.message);
       } finally {
@@ -40,30 +35,29 @@ const Home = () => {
   }
 
   return (
-    <div className={classes.container}>
-      <ul className={classes.ul}>
+    <div className="max-w-[50.00rem] my-10  m-auto  py-0  px-8">
+      <ul className="p-0 list-none">
         {posts.map((post) => (
-          <li key={post.id} className={classes.postList}>
-            <Link href={`/posts/${post.id}`} className={classes.postLink}>
-              <div className={classes.postWrapper}>
+          <li key={post.id} className="border-[1.5px] border-[#bbbbbb] mb-10 p-5">
+            <Link href={`/posts/${post.id}`} className="no-underline text-[#333]">
+              <div className="flex items-center justify-between mb-5 text-[0.80rem] text-[#999]">
                 {/* 日付をJavascriptのnew Date()で返し、toLocaleDateString()で整えて表示する */}
-                <time className={classes.postDate}>
+                <time>
                   {new Date(post.createdAt).toLocaleDateString()}
                 </time>
                 {/* カテゴリーをmapメソッドで取得し表示する */}
                 <div>
-                  {post.categories.map((category) => {
+                  {post.postCategories.map((pc) => {
                     return (
-                      <span key={category.id} className={classes.postCategory}>
-                        {category.name}
-                      </span>
+                      <span key={pc.category.id} className="border-[1px] border-[#2e64a2] rounded-sm p-1.5 mr-3.5 text-[#2e64a2]">
+                        {pc.category.name}</span>
                     );
                   })}
                 </div>
               </div>
-              <h2 className={classes.title}>{post.title}</h2>
+              <h2 className="text-2xl mb-3">{post.title}</h2>
               {/* ReactでHTMLをそのまま表示:dangerouslySetInnerHTML属性を使用 */}
-              <p className={classes.postContent} dangerouslySetInnerHTML={{ __html: post.content }}>
+              <p className="overflow-hidden text-ellipsis line-clamp-2" dangerouslySetInnerHTML={{ __html: post.content }}>
               </p>
             </Link>
           </li>
