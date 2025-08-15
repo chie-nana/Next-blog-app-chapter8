@@ -49,7 +49,7 @@ export const GET = async (request: NextRequest) => {
 // }
 
 // POSTという命名にすることで、POSTリクエストの時にこの関数が呼ばれる
-// ▼ 修正: 使われていない `context: any` を削除
+// ▼ 修正箇所: 使われていない `context: any` を削除
 export const POST = async (request: NextRequest) => {
   try {
     // リクエストのbodyを取得
