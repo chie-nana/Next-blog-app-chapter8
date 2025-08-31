@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import { Post, UpdatePostRequestBody } from "@/app/_types"; // Post型を使うために
 import { Category } from "@/app/_types"; // Category型もインポート！
 import PostForm from "../_components/PostForm"; // PostForm コンポーネントをインポート
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 
 export default function EditPosts({ params }: { params: { id: string } }) { //  URLパラメータを受け取る
   const { id } = params; // URLから記事のIDを取得 (ここで定義されている)
-
   const router = useRouter();
 
   // --- フォームの入力値を管理するStateたち ---
@@ -26,14 +26,25 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
   const [pageError, setPageError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
+  const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
+
 
   useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setPageError(null);
 
     const fetchPost = async () => {
       try {
-        const res = await fetch(`/api/admin/posts/${id}`);
+        const res = await fetch(`/api/admin/posts/${id}`, {
+          headers: {
+            Authorization: token, // 👈 Header に token を付与
+          },
+        });
 
         if (res.ok) {
           // レスポンス型チェック「dataは post というキーを持ち、その中身は Post 型である」と定義する
@@ -69,10 +80,14 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
       }
     };
     fetchPost();// 記事データを取得する関数を実行
-  }, [id]);
+  }, [id, token]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault(); // ページの再読み込みを防ぐ
+      if (!token) {
+        setFormError("認証情報がありません。再度ログインしてください。");
+        return;
+      }
     setLoading(true); // ローディング状態を開始
     setFormError(null); // エラーをリセット
 
@@ -94,6 +109,7 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
         method: "PUT",
         headers: {
           "Content-Type": "application/json", // JSON形式で送る
+          Authorization: token, // 👈 Header に token を付与
         },
         body: JSON.stringify(dataToSend), // JavaScriptのオブジェクトをJSON文字列に変換して送る
       });
@@ -120,6 +136,10 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
 
   const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault(); // ページの再読み込みを防ぐ
+    if (!token) {
+      setFormError("認証情報がありません。再度ログインしてください。");
+      return;
+    }
 
     // ユーザーに確認ダイアログを表示,確認ダイアログでユーザーが「OK 」を選択した場合のみ削除を実行
     if (!window.confirm("本当にこの記事を削除しますか？")) {
@@ -134,6 +154,9 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
     try {
       const res = await fetch(`/api/admin/posts/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: token, // 👈 Header に token を付与
+        },
       });
 
       if (res.ok) {

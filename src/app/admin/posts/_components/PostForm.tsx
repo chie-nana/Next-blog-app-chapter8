@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { Category, GetCategoriesResponse, Post } from "@/app/_types";
 import { Dispatch, SetStateAction } from "react";
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 
 
 
@@ -25,8 +26,6 @@ interface Props {
   onDelete?: (e: React.FormEvent) => void; // 削除関数（オプション）
   mode?: 'new' | 'edit'; // モード（オプション）
   formError?: string | null;// フォーム操作時のエラー (オプション)
-
-
 }
 
 // const PostForm: React.FC<Props> = (props) => {const PostForm: React.FC<Props> = ({
@@ -47,14 +46,24 @@ const PostForm: React.FC<Props> = ({
   const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
   const [errorCategories, setErrorCategories] = useState<string | null>(null);
 
+  const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
+
   //availableCategories を取得するための useEffect
   useEffect(() => {
+    if (!token) {
+      setLoadingCategories(false);
+      return;
+    }
     setLoadingCategories(true);
     setErrorCategories(null);
 
     const fetchCategories = async () => {
       try {
-        const res = await fetch("/api/admin/categories");// カテゴリー一覧APIから取得
+        const res = await fetch("/api/admin/categories", {
+          headers: {
+            Authorization: token, // 👈 Header に token を付与
+          },
+        });// カテゴリー一覧APIから取得
         if (res.ok) {//成功した場合
           const data: GetCategoriesResponse = await res.json();
           setAvailableCategories(data.categories); // { status: "OK", categories: [...] } の形で返すので data.categories を使う
@@ -74,7 +83,7 @@ const PostForm: React.FC<Props> = ({
       }
     };
     fetchCategories();
-  }, []);// 初回ロード時のみ実行
+  }, [token]);
 
   // ▼▼▼ レビュー指摘対応 ▼▼▼
   const handleSelectCategory = (clickedCategory: Category) => {

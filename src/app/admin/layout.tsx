@@ -25,6 +25,7 @@ export default function AdminLayout({ children, }: AdminLayoutProps) {
   }
   return (
     <main className="flex">
+      {/* サイドバー */}
       <aside className="w-64 bg-gray-100 h-screen p-4">
         <nav>
           <ul className="space-y-2">
@@ -33,6 +34,7 @@ export default function AdminLayout({ children, }: AdminLayoutProps) {
           </ul>
         </nav>
       </aside>
+      {/* メインエリア */}
       <div className="flex-1 bg-white p-4">
         {children}
       </div>

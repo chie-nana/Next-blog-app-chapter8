@@ -4,17 +4,29 @@ import React from "react";
 import { Category, GetCategoriesResponse } from "@/app/_types";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const {token} = useSupabaseSession();
 
   useEffect(() => {
-    setLoading(true);
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     const fetchCategories = async () => {
+      setLoading(true);
       try {
-        const res = await fetch('/api/admin/categories');
+        const res = await fetch('/api/admin/categories', {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token, // 👈 Header に token を付与
+          },
+        });
         const data: GetCategoriesResponse = await res.json();
         setCategories(data.categories);
       } catch (error) {
@@ -24,7 +36,7 @@ export default function AdminCategoriesPage() {
       }
     }
     fetchCategories();
-  }, []);
+  }, [token]);
   if (loading) { return <p>読み込み中...</p> }
   if (error) { return <p>エラー: {error}</p> }
   if (categories.length === 0) { return <p>カテゴリーが見つかりませんでした</p> }

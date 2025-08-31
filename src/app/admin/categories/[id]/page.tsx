@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import CategoryForm from "../_components/CategoryForm"
 import { GetCategoryResponse, UpdateCategoryRequestBody } from "@/app/_types";
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+
 
 export default function EditCategories({ params }: { params: { id: string } }) {
   const { id } = params;//IDを取得
@@ -15,14 +17,24 @@ export default function EditCategories({ params }: { params: { id: string } }) {
   const [formError, setFormError] = useState<string | null>(null); // フォーム操作時(更新・削除時)のエラー
 
   const router = useRouter();
+  const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
 
   useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);//`読み込み中
     setPageError(null);   // エラーをリセット（ページ読み込みエラー)
 
     const fetchCategory = async () => {
       try {
-        const res = await fetch(`/api/admin/categories/${id}`);
+        const res = await fetch(`/api/admin/categories/${id}`, {
+          headers: {
+            Authorization: token, // 👈 Header に token を付与
+          },
+        });
         if (res.ok) {// もし成功したら
           const data:GetCategoryResponse  = await res.json();// 成功したデータ（JSON）を読み取る
           setEditCategoryName(data.category.name);//取得したデータを State にセットする処理
@@ -38,10 +50,15 @@ export default function EditCategories({ params }: { params: { id: string } }) {
       }
     }// fetchCategory 関数の定義はここまで
     fetchCategory();//定義した関数を実行
-  }, []);
+  }, [id,token]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();// ページの再読み込みを防ぐ
+
+    if (!token) {
+      setFormError("認証情報がありません。再度ログインしてください。");
+      return;
+    }
     setLoading(true);// ローディング状態を開始
     setFormError(null);// エラーをリセット（更新エラー)
 
@@ -53,6 +70,7 @@ export default function EditCategories({ params }: { params: { id: string } }) {
         method: "PUT",
         headers: {
           "Content-Type": "application/json", // JSON形式で送る
+          Authorization: token, // 👈 Header に token を付与
         },
         body: JSON.stringify(dataTOSend), //JavaScriptのオブジェクトをJSON文字列に変換して送る
       });
@@ -73,6 +91,10 @@ export default function EditCategories({ params }: { params: { id: string } }) {
 
   const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault();// ページの再読み込みを防ぐ
+    if(!token) {
+      setFormError("認証情報がありません。再度ログインしてください。");
+      return;
+    }
 
     if (!window.confirm("本当にこのカテゴリーを削除しますか")) {
       return; // ユーザーがキャンセルした場合、何もしない
@@ -84,6 +106,9 @@ export default function EditCategories({ params }: { params: { id: string } }) {
     try {
       const res = await fetch(`/api/admin/categories/${id}`, {
         method: "DELETE", // DELETEリクエストを送る
+        headers: {
+          Authorization: token,
+        },
       });
 
       if (res.ok) {// サーバーからの応答が成功 (200番台) かどうかをチェック
