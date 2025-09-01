@@ -1,10 +1,13 @@
 // src/app/admin/posts/_components/PostForm.tsx
 
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import { Category, GetCategoriesResponse, Post } from "@/app/_types";
 import { Dispatch, SetStateAction } from "react";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+import { supabase } from "@/utils/supabase";
+import { v4 as uuidv4 } from 'uuid'; // 固有ID生成ライブラリ
+import Image from "next/image";
 
 
 
@@ -41,12 +44,45 @@ const PostForm: React.FC<Props> = ({
   formError,
 }) => {
 
+  const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
+
+
+  //アップロードする画像の「キー」を保存するState
+  const [thumbnailImageKey, setThumbnailImageKey] = useState<string>('');
+
   // ※ 修正点1: カテゴリー取得に必要なStateを PostForm の中で定義する
   const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
   const [errorCategories, setErrorCategories] = useState<string | null>(null);
 
-  const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
+  const handleImageChange = async (event:ChangeEvent<HTMLInputElement>,
+  ):Promise<void> => {
+    if (!event.target.files || event.target.files.length === 0) {
+      // 画像が選択されていないのでreturn
+      return;
+    }
+    const file = event.target.files[0]; // 選択された画像を取得
+    const filePath = `private/${uuidv4()}`; // ファイルパスを指定
+
+    // Supabaseに画像をアップロード
+    const { data, error } = await supabase.storage
+      .from('post_thumbnail')// ここでバケット名を指定
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+      })
+
+    // アップロードに失敗したらエラーを表示して終了
+    if (error) {
+      alert(error.message)
+      return
+    }
+
+    // data.pathに、画像固有のkeyが入っているので、thumbnailImageKeyに格納する
+    setThumbnailImageKey(data.path)
+  }
+
+
 
   //availableCategories を取得するための useEffect
   useEffect(() => {
@@ -155,17 +191,18 @@ const PostForm: React.FC<Props> = ({
         disabled={loading}
       ></textarea>
 
-      <label htmlFor="thumbnailUrl" className="block">サムネイルURL</label>
+      <label htmlFor="thumbnailImageKey" className="block text-sm font-medium text-gray-700">サムネイルURL</label>
       <input
-        id="thumbnailUrl"
-        name="thumbnailUrl"
-        type="text"
+        id="thumbnailImageKey"
+        type="file"
         className="border p-2 w-full rounded block mb-4"
-        value={post.thumbnailUrl}
-        // onChange={(e) => { props.setPost({ ...props.post, thumbnailUrl: e.target.value }) }}
-        onChange={(e) => setPost(prev => prev ? { ...prev, thumbnailUrl: e.target.value } : null)}
-        disabled={loading}
+        onChange={handleImageChange}
+        accept="image/*"// 画像ファイルのみ選択できるようにする
+        disabled={loading} // アップロード中も無効化
       />
+
+
+
       {/* カテゴリー選択欄 - ここから新しい方式に置き換える */}
       <label htmlFor="postCategories" className="block text-sm font-medium text-gray-700 mb-1">カテゴリー</label>
       {/*  ここから select タグの代わりに div ベースの選択肢を配置  */}
