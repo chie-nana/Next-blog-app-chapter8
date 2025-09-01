@@ -47,16 +47,20 @@ const PostForm: React.FC<Props> = ({
   const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
 
 
-  //アップロードする画像の「キー」を保存するState
-  const [thumbnailImageKey, setThumbnailImageKey] = useState<string>('');
-
   // ※ 修正点1: カテゴリー取得に必要なStateを PostForm の中で定義する
   const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
   const [errorCategories, setErrorCategories] = useState<string | null>(null);
 
-  const handleImageChange = async (event:ChangeEvent<HTMLInputElement>,
-  ):Promise<void> => {
+  //アップロードする画像の「キー」を保存するState
+  const [thumbnailImageKey, setThumbnailImageKey] = useState<string>('');
+  //アップロードした画像のURLを保存するState
+  const [thumbnailImageUrl, setThumbnailImageUrl] = useState<null | string>(
+    null,
+  )
+
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>,
+  ): Promise<void> => {
     if (!event.target.files || event.target.files.length === 0) {
       // 画像が選択されていないのでreturn
       return;
@@ -71,17 +75,32 @@ const PostForm: React.FC<Props> = ({
         cacheControl: '3600',
         upsert: false,
       })
-
     // アップロードに失敗したらエラーを表示して終了
     if (error) {
       alert(error.message)
       return
     }
-
     // data.pathに、画像固有のkeyが入っているので、thumbnailImageKeyに格納する
     setThumbnailImageKey(data.path)
   }
 
+
+  // DBに保存しているthumbnailImageKeyから、Supabaseの画像のURLを取得する
+  useEffect(() => {
+    if (!thumbnailImageKey) return
+    // アップロード時に取得した、thumbnailImageKeyを用いて画像のURLを取得
+    const fetcher = async () => {
+      const {
+        data: { publicUrl },
+      } = await supabase.storage
+        .from('post_thumbnail')
+        .getPublicUrl(thumbnailImageKey)
+      setThumbnailImageUrl(publicUrl)
+      // 取得した画像のURLを、親コンポーネントに伝える
+      setPost(prev => prev ? { ...prev, thumbnailUrl: publicUrl } : null)
+    }
+    fetcher()
+  }, [thumbnailImageKey])
 
 
   //availableCategories を取得するための useEffect
@@ -107,7 +126,7 @@ const PostForm: React.FC<Props> = ({
           const errorData = await res.json();
           throw new Error(errorData.message || "カテゴリーの取得に失敗しました");
         }
-      } catch(error: unknown) { // anyをunknownに修正
+      } catch (error: unknown) { // anyをunknownに修正
         if (error instanceof Error) {
           setErrorCategories(error.message);
         } else {
@@ -200,8 +219,17 @@ const PostForm: React.FC<Props> = ({
         accept="image/*"// 画像ファイルのみ選択できるようにする
         disabled={loading} // アップロード中も無効化
       />
-
-
+      {/* 既存の画像か、新しくアップロードした画像があれば表示 */}
+      {thumbnailImageUrl && (
+        <div className="mt-2">
+          <Image
+            src={thumbnailImageUrl} //※URLをImageタグのsrcにセットすることで、画像を表示できる※supabase.storage.from('post_thumbnail').getPublicUrl(thumbnailImageKey)
+            alt="thumbnail"
+            width={400}
+            height={400}
+          />
+        </div>
+      )}
 
       {/* カテゴリー選択欄 - ここから新しい方式に置き換える */}
       <label htmlFor="postCategories" className="block text-sm font-medium text-gray-700 mb-1">カテゴリー</label>
