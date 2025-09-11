@@ -16,7 +16,7 @@ export const GET = async (request: NextRequest) => {
   // 送ったtokenが正しくない場合、errorが返却されるので、クライアントにもエラーを返す
   if(error)
     return NextResponse.json({ status: error.message }, { status: 400 })
-  
+
   // tokenが正しい場合、以降が実行される
   try {
     const postsFromDb = await prisma.post.findMany({
@@ -67,14 +67,14 @@ export const POST = async (request: NextRequest) => {
     const body = await request.json()
 
     // bodyの中からtitle, content, categories, thumbnailUrlを取り出す(分割代入)
-    const { title, content, categories, thumbnailUrl }: CreatePostRequestBody = body
+    const { title, content, categories, thumbnailImageKey }: CreatePostRequestBody = body
 
     // 投稿をDBに生成
     const data = await prisma.post.create({
       data: {
         title,
         content,
-        thumbnailUrl,
+        thumbnailImageKey,
       },
     })
     // 記事とカテゴリーの中間テーブルのレコードをDBに生成

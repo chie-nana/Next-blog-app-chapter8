@@ -15,7 +15,7 @@ export default function CreatePosts() {
     id: 0,
     title: '',
     content: '',
-    thumbnailUrl: '',
+    thumbnailImageKey: '',
     createdAt: '',
     postCategories: [],
   });
@@ -47,10 +47,13 @@ export default function CreatePosts() {
       const dataToSend: CreatePostRequestBody = {
         title: post.title,
         content: post.content,
-        thumbnailUrl: post.thumbnailUrl,
+        thumbnailImageKey: post.thumbnailImageKey,
         categories: newPostCategories,
       };
-
+      // ▼▼▼ 追加: APIに送信する直前のデータの中身を確認します ▼▼▼
+      console.log("APIに送信するデータ:", dataToSend);
+      // ▲▲▲ 追加ここまで ▲▲▲
+      
       const res = await fetch("/api/admin/posts", {
         method: "POST",
         headers: {

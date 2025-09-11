@@ -85,7 +85,7 @@ export const PUT = async (
   const { id } = params//処理している記事のID
 
   // リクエストのbodyを取得
-  const { title, content, categories, thumbnailUrl }: UpdatePostRequestBody = await request.json()
+  const { title, content, categories, thumbnailImageKey }: UpdatePostRequestBody = await request.json()
   try {
     // ▼▼▼ 修正箇所 ▼▼▼
     // 記事本体を更新
@@ -96,7 +96,7 @@ export const PUT = async (
       data: {
         title,
         content,
-        thumbnailUrl
+        thumbnailImageKey
       },
     })
 
@@ -161,7 +161,7 @@ export const DELETE = async (
   if (authError) {
     return NextResponse.json({ status: authError.message }, { status: 401 });
   }
-  
+
   // paramsの中にidが入っているので、それを取り出す
   const { id } = params;
 

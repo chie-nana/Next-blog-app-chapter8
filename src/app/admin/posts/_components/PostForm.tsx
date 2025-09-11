@@ -90,17 +90,31 @@ const PostForm: React.FC<Props> = ({
     if (!thumbnailImageKey) return
     // アップロード時に取得した、thumbnailImageKeyを用いて画像のURLを取得
     const fetcher = async () => {
+      // ▼▼▼ 修正点1: `await`を削除 ▼▼▼
       const {
         data: { publicUrl },
       } = await supabase.storage
         .from('post_thumbnail')
         .getPublicUrl(thumbnailImageKey)
       setThumbnailImageUrl(publicUrl)
+
+      // ▼▼▼ 修正点2: 正しい名前(`thumbnailImageKey`)に、正しいデータ(`thumbnailImageKey`)をセットする ▼▼▼
       // 取得した画像のURLを、親コンポーネントに伝える
-      setPost(prev => prev ? { ...prev, thumbnailUrl: publicUrl } : null)
+      setPost(prev => prev ? { ...prev, thumbnailImageKey: thumbnailImageKey } : null);
     }
     fetcher()
   }, [thumbnailImageKey])
+
+// ▼▼▼ 編集画面で、既存のキーからURLを生成するuseEffect ▼▼▼
+  useEffect(() => {
+    if (mode === 'edit' && !thumbnailImageUrl && post?.thumbnailImageKey) {
+    const {data} = supabase.storage
+        .from('post_thumbnail')
+        .getPublicUrl(post.thumbnailImageKey);
+      setThumbnailImageUrl(data.publicUrl);
+  }
+},[mode, post, thumbnailImageUrl]);
+// ▲▲▲ 追加ここまで ▲▲▲
 
 
   //availableCategories を取得するための useEffect

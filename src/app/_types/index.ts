@@ -4,7 +4,7 @@
 export type Post = {
   id: number;
   title: string;
-  thumbnailUrl: string;
+  thumbnailImageKey: string
   content: string;
   createdAt: string;
   postCategories: { category: Category }[]; // カテゴリーは配列で、各カテゴリーはidとnameを持つ
@@ -39,7 +39,7 @@ export interface CreatePostRequestBody {///api/admin/posts/route.ts ファイル
   title: string
   content: string
   categories: { id: number }[]
-  thumbnailUrl: string
+  thumbnailImageKey: string
 }
 
 // 記事更新（記事編集）時に送られてくるリクエストのbodyの型(posts/[id]/)
@@ -47,7 +47,7 @@ export interface UpdatePostRequestBody {///api/admin/posts/[id]/route.ts ファ�
   title: string,
   content: string,
   categories: { id: number }[],
-  thumbnailUrl: string
+  thumbnailImageKey: string
 }
 
 

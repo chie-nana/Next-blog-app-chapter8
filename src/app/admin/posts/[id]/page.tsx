@@ -98,7 +98,7 @@ export default function EditPosts({ params }: { params: { id: string } }) { //  
         //バックエンドの形と合わせる
         title: post.title,
         content: post.content,
-        thumbnailUrl: post.thumbnailUrl,
+        thumbnailImageKey: post.thumbnailImageKey,
         categories: editPostCategories,
         // title: editPostTitle,
         // content: editPostContent,
