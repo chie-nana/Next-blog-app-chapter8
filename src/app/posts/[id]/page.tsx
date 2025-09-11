@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Post } from "@/app/_types";
 import Image from "next/image";
+import { supabase } from '@/utils/supabase';
 
 export const PostDetail: React.FC = () => {
   const params = useParams(); // ← useParamsフックはNext.jsではオブジェクト型で返される
@@ -13,6 +14,10 @@ export const PostDetail: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Imageタグのsrcにセットする画像URLを持たせるstate
+  const [thumbnailImageUrl, setThumbnailImageUrl] = useState<null | string>(
+    null
+  );
 
   // useEffect を使って、記事詳細APIからデータを取得する
   useEffect(() => {
@@ -31,22 +36,39 @@ export const PostDetail: React.FC = () => {
     fetchPost();
   }, [id]);
 
+  // DBに保存しているthumbnailImageKeyを元に、Supabaseから画像のURLを取得する
+  useEffect(() => {
+    if (!post?.thumbnailImageKey) return;
+
+    const fetcher = async () => {
+      const {
+        data: { publicUrl },
+      } = await supabase.storage
+        .from("post_thumbnail")
+        .getPublicUrl(post.thumbnailImageKey);
+
+      setThumbnailImageUrl(publicUrl);
+    };
+
+    fetcher();
+  }, [post?.thumbnailImageKey]);
+
   if (loading) return <p>読み込み中</p>;
   if (error) return <p>エラー:{error}</p>;
   if (!post) return <p>記事が見つかりませんでした</p>;
   return (
     <div className="max-w-[50.00rem] my-12  m-auto  py-0  px-8">
       <div>
-        {/* Imageの最適化。Next.jsではimgではなくImage推奨 */}
+        {thumbnailImageUrl && (
         <div className="w-3/4 my-8 m-auto">
-          <Image
-            src={post.thumbnailUrl}
-            alt={post.title}
-            width={800}
-            height={400}
-            className="w-full"
+        <Image src={thumbnailImageUrl}
+          alt=""
+          height={800}
+          width={800}
+          className="w-full"
           />
-        </div>
+      </div>
+        )}
 
         <div className="flex items-center justify-between mt-5 mb-5 text-[0.80rem] text-[#333]">
           <time>

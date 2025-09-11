@@ -43,7 +43,15 @@ export const GET = async (request: NextRequest) => {
     // レスポンスを返す
     return NextResponse.json<GetPostsResponse>({ status: "OK", posts: posts }, { status: 200 })
   } catch (error) {
-    if (error instanceof Error)
-      return NextResponse.json({ status: error.message }, { status: 400 })
+    // ▼▼▼ 修正点 ▼▼▼
+    // サーバーのコンソールに実際のエラー内容を出力する
+    console.error("APIルートでエラーが発生しました:", error);
+    // ▲▲▲ 修正点 ▲▲▲
+   if (error instanceof Error) {
+      // フロントエンドには汎用的なエラーメッセージを返す
+      return NextResponse.json({ message: "サーバーでエラーが発生しました。", error: error.message }, { status: 500 });
+    }
+    // その他の予期せぬエラー
+    return NextResponse.json({ message: "予期せぬエラーが発生しました。" }, { status: 500 });
   }
-}
+};

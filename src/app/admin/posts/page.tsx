@@ -1,23 +1,40 @@
+// src/app/admin/posts/page.tsx
+
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { GetPostsResponse, Post } from "@/app/_types";
 import Link from "next/link";
+import {useSupabaseSession} from "@/app/_hooks/useSupabaseSession";
 
 export default function AdminPostsPage() {
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
 
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    // tokenがまだ取得できていない場合は、APIリクエストを実行しない
+    if (!token) {
+      // ローディング状態だけを更新し、処理を中断
+      setLoading(false);
+      return;
+    }
 
     const fetchPosts = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const res = await fetch("/api/admin/posts");
+        const res = await fetch("/api/admin/posts", {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token, // 👈 Header に token を付与
+          },
+        });
+
         if (res.ok) {
           // { posts: Post[] }からより具体的に修正
           const data: GetPostsResponse  = await res.json();
@@ -39,7 +56,7 @@ export default function AdminPostsPage() {
       }
     }
     fetchPosts();
-  }, [])
+  }, [token])
   if (loading) { return <p>読み込み中...</p> }
   if (error) { return <p>エラー: {error}</p> }
   if (posts.length === 0) { return <p>記事が見つかりませんでした</p> }

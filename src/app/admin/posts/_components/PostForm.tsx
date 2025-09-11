@@ -1,9 +1,13 @@
 // src/app/admin/posts/_components/PostForm.tsx
 
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import { Category, GetCategoriesResponse, Post } from "@/app/_types";
 import { Dispatch, SetStateAction } from "react";
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+import { supabase } from "@/utils/supabase";
+import { v4 as uuidv4 } from 'uuid'; // 固有ID生成ライブラリ
+import Image from "next/image";
 
 
 
@@ -25,8 +29,6 @@ interface Props {
   onDelete?: (e: React.FormEvent) => void; // 削除関数（オプション）
   mode?: 'new' | 'edit'; // モード（オプション）
   formError?: string | null;// フォーム操作時のエラー (オプション)
-
-
 }
 
 // const PostForm: React.FC<Props> = (props) => {const PostForm: React.FC<Props> = ({
@@ -42,19 +44,95 @@ const PostForm: React.FC<Props> = ({
   formError,
 }) => {
 
+  const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
+
+
   // ※ 修正点1: カテゴリー取得に必要なStateを PostForm の中で定義する
   const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
   const [errorCategories, setErrorCategories] = useState<string | null>(null);
 
+  //アップロードする画像の「キー」を保存するState
+  const [thumbnailImageKey, setThumbnailImageKey] = useState<string>('');
+  //アップロードした画像のURLを保存するState
+  const [thumbnailImageUrl, setThumbnailImageUrl] = useState<null | string>(
+    null,
+  )
+
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>,
+  ): Promise<void> => {
+    if (!event.target.files || event.target.files.length === 0) {
+      // 画像が選択されていないのでreturn
+      return;
+    }
+    const file = event.target.files[0]; // 選択された画像を取得
+    const filePath = `private/${uuidv4()}`; // ファイルパスを指定
+
+    // Supabaseに画像をアップロード
+    const { data, error } = await supabase.storage
+      .from('post_thumbnail')// ここでバケット名を指定
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+      })
+    // アップロードに失敗したらエラーを表示して終了
+    if (error) {
+      alert(error.message)
+      return
+    }
+    // data.pathに、画像固有のkeyが入っているので、thumbnailImageKeyに格納する
+    setThumbnailImageKey(data.path)
+  }
+
+
+  // DBに保存しているthumbnailImageKeyから、Supabaseの画像のURLを取得する
+  useEffect(() => {
+    if (!thumbnailImageKey) return
+    // アップロード時に取得した、thumbnailImageKeyを用いて画像のURLを取得
+    const fetcher = async () => {
+      // ▼▼▼ 修正点1: `await`を削除 ▼▼▼
+      const {
+        data: { publicUrl },
+      } = await supabase.storage
+        .from('post_thumbnail')
+        .getPublicUrl(thumbnailImageKey)
+      setThumbnailImageUrl(publicUrl)
+
+      // ▼▼▼ 修正点2: 正しい名前(`thumbnailImageKey`)に、正しいデータ(`thumbnailImageKey`)をセットする ▼▼▼
+      // 取得した画像のURLを、親コンポーネントに伝える
+      setPost(prev => prev ? { ...prev, thumbnailImageKey: thumbnailImageKey } : null);
+    }
+    fetcher()
+  }, [thumbnailImageKey])
+
+// ▼▼▼ 編集画面で、既存のキーからURLを生成するuseEffect ▼▼▼
+  useEffect(() => {
+    if (mode === 'edit' && !thumbnailImageUrl && post?.thumbnailImageKey) {
+    const {data} = supabase.storage
+        .from('post_thumbnail')
+        .getPublicUrl(post.thumbnailImageKey);
+      setThumbnailImageUrl(data.publicUrl);
+  }
+},[mode, post, thumbnailImageUrl]);
+// ▲▲▲ 追加ここまで ▲▲▲
+
+
   //availableCategories を取得するための useEffect
   useEffect(() => {
+    if (!token) {
+      setLoadingCategories(false);
+      return;
+    }
     setLoadingCategories(true);
     setErrorCategories(null);
 
     const fetchCategories = async () => {
       try {
-        const res = await fetch("/api/admin/categories");// カテゴリー一覧APIから取得
+        const res = await fetch("/api/admin/categories", {
+          headers: {
+            Authorization: token, // 👈 Header に token を付与
+          },
+        });// カテゴリー一覧APIから取得
         if (res.ok) {//成功した場合
           const data: GetCategoriesResponse = await res.json();
           setAvailableCategories(data.categories); // { status: "OK", categories: [...] } の形で返すので data.categories を使う
@@ -62,7 +140,7 @@ const PostForm: React.FC<Props> = ({
           const errorData = await res.json();
           throw new Error(errorData.message || "カテゴリーの取得に失敗しました");
         }
-      } catch(error: unknown) { // anyをunknownに修正
+      } catch (error: unknown) { // anyをunknownに修正
         if (error instanceof Error) {
           setErrorCategories(error.message);
         } else {
@@ -74,7 +152,7 @@ const PostForm: React.FC<Props> = ({
       }
     };
     fetchCategories();
-  }, []);// 初回ロード時のみ実行
+  }, [token]);
 
   // ▼▼▼ レビュー指摘対応 ▼▼▼
   const handleSelectCategory = (clickedCategory: Category) => {
@@ -146,17 +224,27 @@ const PostForm: React.FC<Props> = ({
         disabled={loading}
       ></textarea>
 
-      <label htmlFor="thumbnailUrl" className="block">サムネイルURL</label>
+      <label htmlFor="thumbnailImageKey" className="block text-sm font-medium text-gray-700">サムネイルURL</label>
       <input
-        id="thumbnailUrl"
-        name="thumbnailUrl"
-        type="text"
+        id="thumbnailImageKey"
+        type="file"
         className="border p-2 w-full rounded block mb-4"
-        value={post.thumbnailUrl}
-        // onChange={(e) => { props.setPost({ ...props.post, thumbnailUrl: e.target.value }) }}
-        onChange={(e) => setPost(prev => prev ? { ...prev, thumbnailUrl: e.target.value } : null)}
-        disabled={loading}
+        onChange={handleImageChange}
+        accept="image/*"// 画像ファイルのみ選択できるようにする
+        disabled={loading} // アップロード中も無効化
       />
+      {/* 既存の画像か、新しくアップロードした画像があれば表示 */}
+      {thumbnailImageUrl && (
+        <div className="mt-2">
+          <Image
+            src={thumbnailImageUrl} //※URLをImageタグのsrcにセットすることで、画像を表示できる※supabase.storage.from('post_thumbnail').getPublicUrl(thumbnailImageKey)
+            alt="thumbnail"
+            width={400}
+            height={400}
+          />
+        </div>
+      )}
+
       {/* カテゴリー選択欄 - ここから新しい方式に置き換える */}
       <label htmlFor="postCategories" className="block text-sm font-medium text-gray-700 mb-1">カテゴリー</label>
       {/*  ここから select タグの代わりに div ベースの選択肢を配置  */}
