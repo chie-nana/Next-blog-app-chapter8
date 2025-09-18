@@ -108,6 +108,30 @@ export interface UpdatePostResponse {
 }
 
 
+// ========================================================================
+// 4. フォーム入力値の型 (react-hook-formなどで使用)
+// ========================================================================
+
+/** サインアップフォームの入力値 */
+export type SignUpFormInput = {
+  email: string;
+  password: string;
+};
+
+/** ログインフォームの入力値 */
+export type LoginFormInput = {
+  email: string;
+  password: string;
+};
+
+/** お問い合わせフォームの入力値 */
+export type ContactFormInput = {
+  name: string;
+  email: string;
+  message: string;
+};
+
+
 
 // ここから不要になるはず
 // Responseレスポンス(取得する時)、バックエンドからのレスポンス、フロント側ではdataの型

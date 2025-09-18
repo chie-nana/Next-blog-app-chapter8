@@ -11,6 +11,7 @@ import Image from "next/image";
 
 
 
+
 // PostForm コンポーネントが外から受け取る情報の「型」を定義
 interface Props {
   post: Post | null;//PostFormがpostデータなし（null）の状態も受け入れられるように、post: Post | nullと修正

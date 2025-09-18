@@ -6,13 +6,7 @@ import { supabase } from "@/utils/supabase";
 import { useRouter } from "next/navigation";
 // import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";// react-hook-formのuseForm`SubmitHandler`ををインポート
-
-
-// フォームの入力値の型を定義
-type LoginFormInput = {
-  email: string;
-  password: string;
-};
+import { LoginFormInput } from "../_types";
 
 export default function Page() {
   // const [email, setEmail] = useState("");
