@@ -1,65 +1,84 @@
 // src/app/admin/posts/page.tsx
 
 "use client";
-
-import React, { useState, useEffect } from "react";
+import React from "react";
+// import React, { useState, useEffect } from "react";
 import { GetPostsResponse, Post } from "@/app/_types";
 import Link from "next/link";
-import {useSupabaseSession} from "@/app/_hooks/useSupabaseSession";
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+import useSWR from 'swr';
+import { fetcherWithToken } from "@/lib/fetcher";
 
 export default function AdminPostsPage() {
 
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  // ▼▼▼ SWR導入修正: 3つのuseStateとuseEffectが、この数行に置き換わる▼▼▼
+  // const [posts, setPosts] = useState<Post[]>([]);
+  // const [loading, setLoading] = useState<boolean>(true);
+  // const [error, setError] = useState<string | null>(null);
+
   const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
 
+  // SWRフックを呼び出す
+  // 第1引数(key): tokenがあれば[url, token]を、なければnullを渡す
+  // 第2引数(fetcher): 作成したfetcherWithTokenを渡す
 
-  useEffect(() => {
-    // tokenがまだ取得できていない場合は、APIリクエストを実行しない
-    if (!token) {
-      // ローディング状態だけを更新し、処理を中断
-      setLoading(false);
-      return;
-    }
+  const { data, error, isLoading } = useSWR<GetPostsResponse>(
+    token ? ["/api/admin/posts", token] : null,
+    fetcherWithToken
+  );
 
-    const fetchPosts = async () => {
-      setLoading(true);
-      setError(null);
+  // useEffect(() => {
+  //   // tokenがまだ取得できていない場合は、APIリクエストを実行しない
+  //   if (!token) {
+  //     // ローディング状態だけを更新し、処理を中断
+  //     setLoading(false);
+  //     return;
+  //   }
 
-      try {
-        const res = await fetch("/api/admin/posts", {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: token, // 👈 Header に token を付与
-          },
-        });
+  //   const fetchPosts = async () => {
+  //     setLoading(true);
+  //     setError(null);
 
-        if (res.ok) {
-          // { posts: Post[] }からより具体的に修正
-          const data: GetPostsResponse  = await res.json();
-          setPosts(data.posts);
-        } else {
-          const errorData = await res.json();
-          throw new Error(errorData.status || "記事の取得に失敗しました");
-        }
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          setError(error.message);
-        } else {
-          setError("予期せぬエラーが発生しました");
-        }
-        console.error("記事の取得中にエラーが発生しました:", error);
-      }
-      finally {
-        setLoading(false);
-      }
-    }
-    fetchPosts();
-  }, [token])
-  if (loading) { return <p>読み込み中...</p> }
-  if (error) { return <p>エラー: {error}</p> }
-  if (posts.length === 0) { return <p>記事が見つかりませんでした</p> }
+  //     try {
+  //       const res = await fetch("/api/admin/posts", {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           Authorization: token, // 👈 Header に token を付与
+  //         },
+  //       });
+
+  //       if (res.ok) {
+  //         // { posts: Post[] }からより具体的に修正
+  //         const data: GetPostsResponse  = await res.json();
+  //         setPosts(data.posts);
+  //       } else {
+  //         const errorData = await res.json();
+  //         throw new Error(errorData.status || "記事の取得に失敗しました");
+  //       }
+  //     } catch (error: unknown) {
+  //       if (error instanceof Error) {
+  //         setError(error.message);
+  //       } else {
+  //         setError("予期せぬエラーが発生しました");
+  //       }
+  //       console.error("記事の取得中にエラーが発生しました:", error);
+  //     }
+  //     finally {
+  //       setLoading(false);
+  //     }
+  //   }
+  //   fetchPosts();
+  // }, [token])
+
+  // if (loading) { return <p>読み込み中...</p> }
+  // if (error) { return <p>エラー: {error}</p> }
+  // if (posts.length === 0) { return <p>記事が見つかりませんでした</p> }
+
+  if (isLoading || !token) { return <p>読み込み中...</p> } //SWRのローディングかtokenの準備中のどちらかでローディング表示を出す挙動を自動で管理してくれる
+  if (error) { return <p>エラー: {error}</p> } // SWRがエラー状態を自動で管理してくれる
+
+  // if (posts.length === 0) { return <p>記事が見つかりませんでした</p> }
+  const posts = data?.posts || []; // dataがundefinedの場合に備えて空配列をデフォルト値として設定
 
 
   return (
