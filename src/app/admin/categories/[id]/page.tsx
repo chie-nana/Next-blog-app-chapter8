@@ -19,7 +19,7 @@ export default function EditCategories({ params }: { params: { id: string } }) {
   const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
 
   const { data, error: pageError, isLoading: pageLoading } = useFetch<GetCategoryResponse>(
-    id ? `api/admin/categories/${id}` : null
+    id ? `/api/admin/categories/${id}` : null
   );
   //▼▼▼ 修正: データ取得をSWRに置き換え
   // const {data, error: pageError, isLoading: pageLoading} = useSWR<GetCategoryResponse>(//ページ全体のデータ取得の状態（SWRが管理）:errorとloading別名称にしてコンフリクト対策
@@ -114,7 +114,7 @@ export default function EditCategories({ params }: { params: { id: string } }) {
 
   const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault();// ページの再読み込みを防ぐ
-    if(!token) {
+    if (!token) {
       setFormError("認証情報がありません。再度ログインしてください。");
       return;
     }
