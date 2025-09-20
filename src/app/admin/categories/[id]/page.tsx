@@ -5,20 +5,27 @@ import { useRouter } from "next/navigation";
 import CategoryForm from "../_components/CategoryForm"
 import { GetCategoryResponse, UpdateCategoryRequestBody } from "@/app/_types";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
-import useSWR from 'swr';
-import { fetcherWithToken } from "@/lib/fetcher";
+// import useSWR from 'swr';
+// import { fetcherWithToken } from "@/lib/fetcher";
+import { useFetch } from "@/app/_hooks/useFetch";
+
 
 
 export default function EditCategories({ params }: { params: { id: string } }) {
   const { id } = params;//IDを取得
   // ここでIDを使ってカテゴリーの情報を取得し、編集フォームに表示する
   const router = useRouter();
+  // handleUpdateとhandleDeleteでtokenが必要なため、この行は残す
   const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
-  //▼▼▼ 修正点1: データ取得をSWRに置き換え
-  const {data, error: pageError, isLoading: pageLoading} = useSWR<GetCategoryResponse>(//ページ全体のデータ取得の状態（SWRが管理）:errorとloading別名称にしてコンフリクト対策
-    token && id ? [`/api/admin/categories/${id}`, token] : null,
-    fetcherWithToken
+
+  const { data, error: pageError, isLoading: pageLoading } = useFetch<GetCategoryResponse>(
+    id ? `api/admin/categories/${id}` : null
   );
+  //▼▼▼ 修正: データ取得をSWRに置き換え
+  // const {data, error: pageError, isLoading: pageLoading} = useSWR<GetCategoryResponse>(//ページ全体のデータ取得の状態（SWRが管理）:errorとloading別名称にしてコンフリクト対策
+  //   token && id ? [`/api/admin/categories/${id}`, token] : null,
+  //   fetcherWithToken
+  // );
 
   // ▼▼▼ 修正点2: フォームの「入力値」を管理するStateは維持
   const [editCategoryName, setEditCategoryName] = useState<string>('');

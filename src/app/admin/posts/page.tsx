@@ -5,9 +5,10 @@ import React from "react";
 // import React, { useState, useEffect } from "react";
 import { GetPostsResponse, Post } from "@/app/_types";
 import Link from "next/link";
-import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
-import useSWR from 'swr';
-import { fetcherWithToken } from "@/lib/fetcher";
+// import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+// import useSWR from 'swr';
+// import { fetcherWithToken } from "@/lib/fetcher";
+import { useFetch } from "@/app/_hooks/useFetch";
 
 export default function AdminPostsPage() {
 
@@ -16,16 +17,18 @@ export default function AdminPostsPage() {
   // const [loading, setLoading] = useState<boolean>(true);
   // const [error, setError] = useState<string | null>(null);
 
-  const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
+  // const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
 
   // SWRフックを呼び出す
   // 第1引数(key): tokenがあれば[url, token]を、なければnullを渡す
   // 第2引数(fetcher): 作成したfetcherWithTokenを渡す
 
-  const { data, error, isLoading } = useSWR<GetPostsResponse>(
-    token ? ["/api/admin/posts", token] : null,
-    fetcherWithToken
-  );
+  const { data, error, isLoading } = useFetch<GetPostsResponse>("/api/admin/posts")
+
+  // const { data, error, isLoading } = useSWR<GetPostsResponse>(
+  //   token ? ["/api/admin/posts", token] : null,
+  //   fetcherWithToken
+  // );
 
   // useEffect(() => {
   //   // tokenがまだ取得できていない場合は、APIリクエストを実行しない
@@ -74,7 +77,7 @@ export default function AdminPostsPage() {
   // if (error) { return <p>エラー: {error}</p> }
   // if (posts.length === 0) { return <p>記事が見つかりませんでした</p> }
 
-  if (isLoading || !token) { return <p>読み込み中...</p> } //SWRのローディングかtokenの準備中のどちらかでローディング表示を出す挙動を自動で管理してくれる
+  if (isLoading) { return <p>読み込み中...</p> } //SWRのローディングかtokenの準備中のどちらかでローディング表示を出す挙動を自動で管理してくれる
   if (error) { return <p>エラー: {error}</p> } // SWRがエラー状態を自動で管理してくれる
 
   // if (posts.length === 0) { return <p>記事が見つかりませんでした</p> }

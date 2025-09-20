@@ -7,8 +7,9 @@ import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { supabase } from "@/utils/supabase";
 import { v4 as uuidv4 } from 'uuid'; // 固有ID生成ライブラリ
 import Image from "next/image";
-import useSWR from 'swr';
-import { fetcherWithToken } from "@/lib/fetcher";
+// import useSWR from 'swr';
+// import { fetcherWithToken } from "@/lib/fetcher";
+import { useFetch } from "@/app/_hooks/useFetch";
 
 
 // PostForm コンポーネントが外から受け取る情報の「型」を定義
@@ -44,15 +45,19 @@ const PostForm: React.FC<Props> = ({
   formError,
 }) => {
 
-  const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
+  // const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
+  const { data: categoriesData, error: categoriesError, isLoading: categoriesLoading } = useFetch<GetCategoriesResponse>(
+    '/api/admin/categories');
+  // `availableCategories`をuseFetchの結果から導出
+  const availableCategories = categoriesData?.categories || [];
 
   // ▼▼▼ 修正: カテゴリー取得のロジックをSWRに置き換え
-  const { data: categoriesData, error: categoriesError, isLoading: categoriesLoading } = useSWR<GetCategoriesResponse>(
-    token ? ["/api/admin/categories", token] : null,
-    fetcherWithToken
-  );
-  // `availableCategories`をSWRの結果から導出
-  const availableCategories = categoriesData?.categories || [];
+  // const { data: categoriesData, error: categoriesError, isLoading: categoriesLoading } = useSWR<GetCategoriesResponse>(
+  //   token ? ["/api/admin/categories", token] : null,
+  //   fetcherWithToken
+  // );
+  // // `availableCategories`をSWRの結果から導出
+  // const availableCategories = categoriesData?.categories || [];
 
 
   // ※ 修正: カテゴリー取得に必要なStateを PostForm の中で定義する

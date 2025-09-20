@@ -7,18 +7,26 @@ import { GetPostResponse, Post, UpdatePostRequestBody } from "@/app/_types"; // 
 import { Category } from "@/app/_types"; // Category型もインポート！
 import PostForm from "../_components/PostForm"; // PostForm コンポーネントをインポート
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
-import useSWR from 'swr';
-import { fetcherWithToken } from "@/lib/fetcher";
+// import useSWR from 'swr';
+// import { fetcherWithToken } from "@/lib/fetcher";
+import { useFetch } from "@/app/_hooks/useFetch";
 
 export default function EditPosts({ params }: { params: { id: string } }) { //  URLパラメータを受け取る
   const { id } = params; // URLから記事のIDを取得 (ここで定義されている)
   const router = useRouter();
+
+  // handleUpdateとhandleDeleteでtokenが必要なため、この行は残す
   const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
-// ▼▼▼ 修正点1: データ取得をSWRに置き換え ▼▼▼
-  const { data, error: pageError, isLoading: pageLoading } = useSWR<GetPostResponse>(//ページ全体のデータ取得の状態（SWRが管理）:errorとloading別名称にしてコンフリクト対策
-    token && id ? [`/api/admin/posts/${id}`, token] : null,
-    fetcherWithToken
+
+  const { data, error: pageError, isLoading: pageLoading } = useFetch<GetPostResponse>(
+    // idが存在する場合のみ、APIのURLを渡す
+    id ? `/api/admin/posts/${id}` : null
   );
+// ▼▼▼ 修正点1: データ取得をSWRに置き換え ▼▼▼
+  // const { data, error: pageError, isLoading: pageLoading } = useSWR<GetPostResponse>(//ページ全体のデータ取得の状態（SWRが管理）:errorとloading別名称にしてコンフリクト対策
+  //   token && id ? [`/api/admin/posts/${id}`, token] : null,
+  //   fetcherWithToken
+  // );
 
   // ▼▼▼ 修正点2: フォームの「入力値」を管理するStateはそのまま維持 ▼▼▼
   // --- フォームの入力値を管理するStateたち ---
