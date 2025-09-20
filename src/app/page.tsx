@@ -3,33 +3,41 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Post } from "@/app/_types";
+import { GetPostsResponse } from "@/app/_types";
+import useSWR from 'swr';
+import { fetcher } from "@/lib/fetcher";// トークン不要版のfetcher
 
 const Home = () => {
-  const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  // const [posts, setPosts] = useState<Post[]>([])
+  // const [loading, setLoading] = useState<boolean>(true);
+  // const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetcher = async () => {
-      try {
-        const res = await fetch('/api/posts')// Nextjsの自作APIへ変更
-        const { posts } = await res.json()
-        setPosts(posts)
-      } catch (error: any) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetcher()
-  }, []);
-  if (loading) {
+  const {data, error, isLoading} = useSWR<GetPostsResponse>('/api/posts', fetcher);// トークン不要版のfetcher
+
+  // useEffect(() => {
+  //   const fetcher = async () => {
+  //     try {
+  //       const res = await fetch('/api/posts')// Nextjsの自作APIへ変更
+  //       const { posts } = await res.json()
+  //       setPosts(posts)
+  //     } catch (error: any) {
+  //       setError(error.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetcher()
+  // }, []);
+
+  if (isLoading) {
     return <p>読み込み中</p>;
   }
   if (error) {
-    return <p>エラー:{error}</p>;
+    return <p>エラー:{error.message}</p>;
   }
+
+  const posts = data?.posts || [];
+
   if (posts.length === 0) {
     return <p>記事が見つかりませんでした</p>;
   }

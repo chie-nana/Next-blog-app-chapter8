@@ -5,52 +5,68 @@ import { useRouter } from "next/navigation";
 import CategoryForm from "../_components/CategoryForm"
 import { GetCategoryResponse, UpdateCategoryRequestBody } from "@/app/_types";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+import useSWR from 'swr';
+import { fetcherWithToken } from "@/lib/fetcher";
 
 
 export default function EditCategories({ params }: { params: { id: string } }) {
   const { id } = params;//IDを取得
   // ここでIDを使ってカテゴリーの情報を取得し、編集フォームに表示する
-
-  const [editCategoryName, setEditCategoryName] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true);//編集ページを開くとデータ取りに行く、最初から「読み込み中(true)」
-  const [pageError, setPageError] = useState<string | null>(null); // ページ読み込み時のエラー
-  const [formError, setFormError] = useState<string | null>(null); // フォーム操作時(更新・削除時)のエラー
-
   const router = useRouter();
   const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
+  //▼▼▼ 修正点1: データ取得をSWRに置き換え
+  const {data, error: pageError, isLoading: pageLoading} = useSWR<GetCategoryResponse>(//ページ全体のデータ取得の状態（SWRが管理）:errorとloading別名称にしてコンフリクト対策
+    token && id ? [`/api/admin/categories/${id}`, token] : null,
+    fetcherWithToken
+  );
+
+  // ▼▼▼ 修正点2: フォームの「入力値」を管理するStateは維持
+  const [editCategoryName, setEditCategoryName] = useState<string>('');
+  //このloading`は、フォームの更新・削除ボタンが押された時用でページ読み込みはSWRにてpageLoading
+  const [loading, setLoading] = useState<boolean>(false);
+  // const [pageError, setPageError] = useState<string | null>(null); // ページ読み込み時のエラー
+  const [formError, setFormError] = useState<string | null>(null); // フォーム操作時(更新・削除時)のエラー
+
+
 
   useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      return;
+    // SWRがデータを取得し、その中にcategoryがあれば
+    if (data?.category) {
+      // フォーム用の`editCategoryName` Stateに、SWRが取得したデータを一度だけコピー
+      setEditCategoryName(data.category.name);
     }
+  }, [data]);//dataが変化した時（＝SWRがデータを取得した時）実行
 
-    setLoading(true);//`読み込み中
-    setPageError(null);   // エラーをリセット（ページ読み込みエラー)
+  //   if (!token) {
+  //     setLoading(false);
+  //     return;
+  //   }
+  //   setLoading(true);//`読み込み中
+  //   setPageError(null);   // エラーをリセット（ページ読み込みエラー)
 
-    const fetchCategory = async () => {
-      try {
-        const res = await fetch(`/api/admin/categories/${id}`, {
-          headers: {
-            Authorization: token, // 👈 Header に token を付与
-          },
-        });
-        if (res.ok) {// もし成功したら
-          const data:GetCategoryResponse  = await res.json();// 成功したデータ（JSON）を読み取る
-          setEditCategoryName(data.category.name);//取得したデータを State にセットする処理
-        } else {// もし失敗したら（res.ok が false なら）
-          const errorData = await res.json();
-          throw new Error(errorData.message || 'カテゴリーの取得に失敗しました');
-        }
-      } catch (error: any) {// try ブロック内でエラーが発生した場合（ネットワークエラーや、上記で throw されたエラー）
-        setPageError(error.message || "カテゴリーの取得に失敗しました");
-        console.error("カテゴリーの取得中にエラーが発生しました:", error);
-      } finally {
-        setLoading(false);//読み込み完了
-      }
-    }// fetchCategory 関数の定義はここまで
-    fetchCategory();//定義した関数を実行
-  }, [id,token]);
+  //   const fetchCategory = async () => {
+  //     try {
+  //       const res = await fetch(`/api/admin/categories/${id}`, {
+  //         headers: {
+  //           Authorization: token, // 👈 Header に token を付与
+  //         },
+  //       });
+  //       if (res.ok) {// もし成功したら
+  //         const data:GetCategoryResponse  = await res.json();// 成功したデータ（JSON）を読み取る
+  //         setEditCategoryName(data.category.name);//取得したデータを State にセットする処理
+  //       } else {// もし失敗したら（res.ok が false なら）
+  //         const errorData = await res.json();
+  //         throw new Error(errorData.message || 'カテゴリーの取得に失敗しました');
+  //       }
+  //     } catch (error: any) {// try ブロック内でエラーが発生した場合（ネットワークエラーや、上記で throw されたエラー）
+  //       setPageError(error.message || "カテゴリーの取得に失敗しました");
+  //       console.error("カテゴリーの取得中にエラーが発生しました:", error);
+  //     } finally {
+  //       setLoading(false);//読み込み完了
+  //     }
+  //   }// fetchCategory 関数の定義はここまで
+  //   fetchCategory();//定義した関数を実行
+  // }, [id,token]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();// ページの再読み込みを防ぐ
@@ -127,8 +143,10 @@ export default function EditCategories({ params }: { params: { id: string } }) {
   };
 
 
-  if (loading) { return <p>読み込み中...</p> }
-  if (pageError) { return <p>エラー: {pageError}</p> }
+  if (pageLoading || !token) { return <p>読み込み中...</p> }
+  if (pageError) { return <p>エラー: {pageError.message}</p> }
+  if (!data?.category) { return <p>カテゴリーが見つかりませんでした。</p>; }
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-8">カテゴリー編集</h1>
