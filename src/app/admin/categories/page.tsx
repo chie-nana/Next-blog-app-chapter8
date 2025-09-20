@@ -1,33 +1,63 @@
+//app/admin/categories/page.tsx
+
 "use client"; // クライアントサイドで実行
 
 import React from "react";
 import { Category, GetCategoriesResponse } from "@/app/_types";
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import Link from "next/link";
+// import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+// import useSWR from "swr";
+// import { fetcherWithToken } from "@/lib/fetcher";
+import { useFetch } from "@/app/_hooks/useFetch";
 
 export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  // const [categories, setCategories] = useState<Category[]>([]);
+  // const [loading, setLoading] = useState<boolean>(true);
+  // const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLoading(true);
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch('/api/admin/categories');
-        const data: GetCategoriesResponse = await res.json();
-        setCategories(data.categories);
-      } catch (error) {
-        setError("カテゴリーの取得に失敗しました");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchCategories();
-  }, []);
-  if (loading) { return <p>読み込み中...</p> }
-  if (error) { return <p>エラー: {error}</p> }
-  if (categories.length === 0) { return <p>カテゴリーが見つかりませんでした</p> }
+
+  const { data, error, isLoading } = useFetch<GetCategoriesResponse>('/api/admin/categories');
+  // const { token } = useSupabaseSession();
+
+  // const { data, error, isLoading } = useSWR<GetCategoriesResponse>(
+  //   token ? ["/api/admin/categories", token] : null,
+  //   fetcherWithToken
+  // );
+
+  // useEffect(() => {
+  //   if (!token) {
+  //     setLoading(false);
+  //     return;
+  //   }
+
+  //   const fetchCategories = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const res = await fetch('/api/admin/categories', {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           Authorization: token, // 👈 Header に token を付与
+  //         },
+  //       });
+  //       const data: GetCategoriesResponse = await res.json();
+  //       setCategories(data.categories);
+  //     } catch (error) {
+  //       setError("カテゴリーの取得に失敗しました");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+  //   fetchCategories();
+  // }, [token]);
+
+  // if (loading) { return <p>読み込み中...</p> }
+  // if (error) { return <p>エラー: {error}</p> }
+  // if (categories.length === 0) { return <p>カテゴリーが見つかりませんでした</p> }
+
+  if (isLoading) { return <p>読み込み中・・・</p>; }
+  if (error) { return <p>エラー:{error.message}</p>; }
+  const categories = data?.categories || [];
 
   return (
     <>

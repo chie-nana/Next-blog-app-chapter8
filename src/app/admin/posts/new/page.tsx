@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Post, CreatePostRequestBody, CreatePostResponse } from "@/app/_types";// Post型を使うためにインポート
 import PostForm from "../_components/PostForm"; // PostForm コンポーネントをインポート
-import {  } from "@/app/_types";
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 
 export default function CreatePosts() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export default function CreatePosts() {
     id: 0,
     title: '',
     content: '',
-    thumbnailUrl: '',
+    thumbnailImageKey: '',
     createdAt: '',
     postCategories: [],
   });
@@ -27,11 +27,16 @@ export default function CreatePosts() {
   const [newPostCategories, setNewPostCategories] = React.useState<{ id: number }[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
+  const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
 
 
   // --- フォーム送信処理 ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!token) {
+      setError("ログイン状態が無効です。再度ログインしてください。");
+      return;
+    }
     setLoading(true);
     setError(null);
 
@@ -42,14 +47,18 @@ export default function CreatePosts() {
       const dataToSend: CreatePostRequestBody = {
         title: post.title,
         content: post.content,
-        thumbnailUrl: post.thumbnailUrl,
+        thumbnailImageKey: post.thumbnailImageKey,
         categories: newPostCategories,
       };
-
+      // ▼▼▼ 追加: APIに送信する直前のデータの中身を確認します ▼▼▼
+      console.log("APIに送信するデータ:", dataToSend);
+      // ▲▲▲ 追加ここまで ▲▲▲
+      
       const res = await fetch("/api/admin/posts", {
         method: "POST",
         headers: {
           'Content-Type': "application/json",
+          Authorization: token, // 👈 Header に token を付与
         },
         body: JSON.stringify(dataToSend),
       });

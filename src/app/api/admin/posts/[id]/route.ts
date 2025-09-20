@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { PrismaClient } from "@prisma/client"
 import { GetPostResponse, Post, UpdatePostRequestBody, UpdatePostResponse } from "@/app/_types"
+import { supabase } from "@/utils/supabase"
 
 
 const prisma = new PrismaClient()
@@ -8,6 +9,14 @@ const prisma = new PrismaClient()
 export const GET = async (
   request: NextRequest, { params }: { params: { id: string } },
 ) => {
+  const token = request.headers.get('Authorization') ?? '';
+  //supabaseに対してtokenを送る
+  const { error: authError } = await supabase.auth.getUser(token);
+  // 送ったtokenが正しくない場合、errorが返却されるので、クライアントにもエラーを返す
+  if (authError)
+    return NextResponse.json({ status: authError.message }, { status: 400 })
+  // tokenが正しい場合、以降が実行される
+
   const { id } = params
   try {
     //（データベースから来た投稿データとしてpostFromDbと命名）
@@ -66,11 +75,17 @@ export const PUT = async (
   request: NextRequest,
   { params }: { params: { id: string } },// ここでリクエストパラメータを受け取る、APIが最初に受け取ったID
 ) => {
+  const token = request.headers.get('Authorization') ?? '';
+  const { error: authError } = await supabase.auth.getUser(token);
+
+  if (authError) {
+    return NextResponse.json({ status: authError.message }, { status: 401 });
+  }
   // paramsの中にidが入っているので、それを取り出す
   const { id } = params//処理している記事のID
 
   // リクエストのbodyを取得
-  const { title, content, categories, thumbnailUrl }: UpdatePostRequestBody = await request.json()
+  const { title, content, categories, thumbnailImageKey }: UpdatePostRequestBody = await request.json()
   try {
     // ▼▼▼ 修正箇所 ▼▼▼
     // 記事本体を更新
@@ -81,7 +96,7 @@ export const PUT = async (
       data: {
         title,
         content,
-        thumbnailUrl
+        thumbnailImageKey
       },
     })
 
@@ -140,6 +155,13 @@ export const DELETE = async (
   request: NextRequest,
   { params }: { params: { id: string } },// ここでリクエストパラメータを受け取る
 ) => {
+  const token = request.headers.get('Authorization') ?? '';
+  const { error: authError } = await supabase.auth.getUser(token);
+
+  if (authError) {
+    return NextResponse.json({ status: authError.message }, { status: 401 });
+  }
+
   // paramsの中にidが入っているので、それを取り出す
   const { id } = params;
 

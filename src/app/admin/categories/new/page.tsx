@@ -4,16 +4,22 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import CategoryForm from "../_components/CategoryForm"; // CategoryForm コンポーネントをインポート
 import { CreateCategoryRequestBody, CreateCategoryResponse } from "@/app/_types";
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 
 export default function CreateCategories() {//※型の有無要確認
   const [newCategoryName, setNewCategoryName] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);//※error有効かされていない
+  const { token } = useSupabaseSession(); // カスタムフックからtokenを取得
 
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {//※React.FCとの違い
     e.preventDefault();
+      if (!token) {
+        setError("ログイン状態が無効です。再度ログインしてください。");
+        return;
+      }
 
     setLoading(true); // フォーム送信が始まるので、loading の情報ボードを「true」（作成中）にする
     setError(null);   // 新しい送信なので、以前のエラーメッセージがあればクリアする
@@ -25,6 +31,7 @@ export default function CreateCategories() {//※型の有無要確認
         method: "POST",
         headers: {
           "Content-Type": "application/json", //json形式で送る
+          Authorization: token, // 👈 Header に token を付与
         },
         body: JSON.stringify(dataToSend),
       });
